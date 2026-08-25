@@ -1,0 +1,47 @@
+@import 'tailwindcss';
+
+@import './design-system/tokens.css';
+@import './design-system/base.css';
+@import './design-system/components.css';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../views/**/*.blade.php';
+
+@theme {
+    /* Typography */
+    --font-sans: var(--nageeb-font-sans);
+    --font-mono: var(--nageeb-font-mono);
+
+    /* Brand palette → Tailwind utilities (bg-primary, text-secondary, …) */
+    --color-primary: var(--nageeb-primary);
+    --color-primary-hover: var(--nageeb-primary-hover);
+    --color-primary-light: var(--nageeb-primary-light);
+    --color-primary-muted: var(--nageeb-primary-muted);
+
+    --color-secondary: var(--nageeb-secondary);
+    --color-secondary-hover: var(--nageeb-secondary-hover);
+    --color-secondary-light: var(--nageeb-secondary-light);
+    --color-secondary-muted: var(--nageeb-secondary-muted);
+
+    --color-support: var(--nageeb-support);
+    --color-support-hover: var(--nageeb-support-hover);
+    --color-support-light: var(--nageeb-support-light);
+    --color-support-muted: var(--nageeb-support-muted);
+
+    --color-background: var(--nageeb-background);
+    --color-surface: var(--nageeb-surface);
+    --color-surface-muted: var(--nageeb-surface-muted);
+
+    --color-text: var(--nageeb-text);
+    --color-text-muted: var(--nageeb-text-muted);
+    --color-text-dim: var(--nageeb-text-dim);
+    --color-text-inverse: var(--nageeb-text-inverse);
+
+    --color-alert: var(--nageeb-alert);
+    --color-alert-hover: var(--nageeb-alert-hover);
+    --color-alert-muted: var(--nageeb-alert-muted);
+
+    --color-border: var(--nageeb-border);
+    --color-border-strong: var(--nageeb-border-strong);
+}

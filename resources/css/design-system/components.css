@@ -1,0 +1,234 @@
+/**
+ * نجيب (Nageeb) — UI Components
+ * مكوّنات أساسية موحّدة للمنصة
+ */
+
+@layer components {
+    .nageeb-container {
+        width: 100%;
+        max-width: var(--nageeb-container-max);
+        margin-inline: auto;
+        padding-inline: var(--nageeb-space-5);
+    }
+
+    /* Typography utilities */
+    .nageeb-title-hero {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 700;
+        line-height: var(--nageeb-leading-tight);
+        color: var(--nageeb-text);
+    }
+
+    .nageeb-title-section {
+        font-size: clamp(1.5rem, 2.5vw, 2rem);
+        font-weight: 600;
+        line-height: var(--nageeb-leading-tight);
+    }
+
+    .nageeb-text-muted {
+        color: var(--nageeb-text-muted);
+    }
+
+    .nageeb-text-dim {
+        color: var(--nageeb-text-dim);
+    }
+
+    /* Buttons */
+    .nageeb-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--nageeb-space-2);
+        padding: 0.75rem 1.5rem;
+        font-family: var(--nageeb-font-sans);
+        font-size: var(--nageeb-text-base);
+        font-weight: 500;
+        line-height: 1;
+        border-radius: var(--nageeb-radius-md);
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition:
+            background-color var(--nageeb-transition-fast),
+            border-color var(--nageeb-transition-fast),
+            color var(--nageeb-transition-fast),
+            box-shadow var(--nageeb-transition-fast);
+    }
+
+    .nageeb-btn--primary {
+        background-color: var(--nageeb-primary);
+        color: var(--nageeb-text-inverse);
+        box-shadow: var(--nageeb-shadow-sm);
+    }
+
+    .nageeb-btn--primary:hover {
+        background-color: var(--nageeb-primary-hover);
+        box-shadow: var(--nageeb-shadow-md);
+    }
+
+    .nageeb-btn--secondary {
+        background-color: var(--nageeb-secondary);
+        color: var(--nageeb-text);
+    }
+
+    .nageeb-btn--secondary:hover {
+        background-color: var(--nageeb-secondary-hover);
+    }
+
+    .nageeb-btn--outline {
+        background-color: transparent;
+        color: var(--nageeb-primary);
+        border-color: var(--nageeb-border-strong);
+    }
+
+    .nageeb-btn--outline:hover {
+        background-color: var(--nageeb-primary-muted);
+        border-color: var(--nageeb-primary);
+    }
+
+    /* Cards */
+    .nageeb-card {
+        background-color: var(--nageeb-surface);
+        border: 1px solid var(--nageeb-border);
+        border-radius: var(--nageeb-radius-lg);
+        padding: var(--nageeb-space-5);
+        box-shadow: var(--nageeb-shadow-sm);
+    }
+
+    .nageeb-card--elevated {
+        box-shadow: var(--nageeb-shadow-md);
+    }
+
+    /* Badges */
+    .nageeb-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        font-size: var(--nageeb-text-sm);
+        font-weight: 500;
+        border-radius: var(--nageeb-radius-full);
+    }
+
+    .nageeb-badge--primary {
+        background-color: var(--nageeb-primary-muted);
+        color: var(--nageeb-primary);
+    }
+
+    .nageeb-badge--support {
+        background-color: var(--nageeb-support-muted);
+        color: var(--nageeb-support-hover);
+    }
+
+    .nageeb-badge--secondary {
+        background-color: var(--nageeb-secondary-muted);
+        color: var(--nageeb-secondary-hover);
+    }
+
+    /* Alerts */
+    .nageeb-alert {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--nageeb-space-3);
+        padding: var(--nageeb-space-4);
+        border-radius: var(--nageeb-radius-md);
+        border: 1px solid transparent;
+        font-size: var(--nageeb-text-sm);
+    }
+
+    .nageeb-alert--error {
+        background-color: var(--nageeb-alert-muted);
+        border-color: rgba(181, 80, 74, 0.25);
+        color: var(--nageeb-alert);
+    }
+
+    .nageeb-alert--success {
+        background-color: var(--nageeb-support-muted);
+        border-color: rgba(123, 168, 149, 0.25);
+        color: var(--nageeb-support-hover);
+    }
+
+    .nageeb-alert--info {
+        background-color: var(--nageeb-primary-muted);
+        border-color: rgba(75, 46, 131, 0.15);
+        color: var(--nageeb-primary);
+    }
+
+    .nageeb-alert--warning {
+        background-color: var(--nageeb-secondary-muted);
+        border-color: rgba(201, 162, 75, 0.25);
+        color: var(--nageeb-secondary-hover);
+    }
+
+    /* Form fields */
+    .nageeb-field {
+        display: flex;
+        flex-direction: column;
+        gap: var(--nageeb-space-2);
+    }
+
+    .nageeb-label {
+        font-size: var(--nageeb-text-sm);
+        font-weight: 500;
+        color: var(--nageeb-text);
+    }
+
+    .nageeb-input,
+    .nageeb-select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-family: var(--nageeb-font-sans);
+        font-size: var(--nageeb-text-base);
+        color: var(--nageeb-text);
+        background-color: var(--nageeb-surface);
+        border: 1px solid var(--nageeb-border-strong);
+        border-radius: var(--nageeb-radius-md);
+        transition:
+            border-color var(--nageeb-transition-fast),
+            box-shadow var(--nageeb-transition-fast);
+    }
+
+    .nageeb-input:focus,
+    .nageeb-select:focus {
+        outline: none;
+        border-color: var(--nageeb-primary);
+        box-shadow: 0 0 0 3px var(--nageeb-primary-muted);
+    }
+
+    .nageeb-input::placeholder {
+        color: var(--nageeb-text-dim);
+    }
+
+    .nageeb-field-error {
+        font-size: var(--nageeb-text-sm);
+        color: var(--nageeb-alert);
+    }
+
+    .nageeb-checkbox {
+        width: 1rem;
+        height: 1rem;
+        accent-color: var(--nageeb-primary);
+    }
+
+    /* Color swatches (design system reference) */
+    .nageeb-swatch {
+        display: flex;
+        flex-direction: column;
+        gap: var(--nageeb-space-2);
+    }
+
+    .nageeb-swatch__color {
+        height: 4rem;
+        border-radius: var(--nageeb-radius-md);
+        border: 1px solid var(--nageeb-border);
+    }
+
+    .nageeb-swatch__label {
+        font-size: var(--nageeb-text-sm);
+        font-weight: 500;
+    }
+
+    .nageeb-swatch__hex {
+        font-family: var(--nageeb-font-mono);
+        font-size: var(--nageeb-text-xs);
+        color: var(--nageeb-text-dim);
+    }
+}

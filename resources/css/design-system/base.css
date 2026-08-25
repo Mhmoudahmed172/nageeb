@@ -1,0 +1,73 @@
+/**
+ * نجيب (Nageeb) — Base Styles
+ * RTL، خطوط، وأساسيات الطباعة
+ */
+
+@layer base {
+    html {
+        direction: rtl;
+        text-align: right;
+        scroll-behavior: smooth;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+        font-family: var(--nageeb-font-sans);
+        font-size: var(--nageeb-text-base);
+        line-height: var(--nageeb-leading-normal);
+        color: var(--nageeb-text);
+        background-color: var(--nageeb-background);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--nageeb-font-sans);
+        font-weight: 600;
+        line-height: var(--nageeb-leading-tight);
+        color: var(--nageeb-text);
+    }
+
+    a {
+        color: var(--nageeb-primary);
+        text-decoration: none;
+        transition: color var(--nageeb-transition-fast);
+    }
+
+    a:hover {
+        color: var(--nageeb-primary-hover);
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+        font-family: var(--nageeb-font-sans);
+    }
+
+    ::selection {
+        background: var(--nageeb-primary-muted);
+        color: var(--nageeb-text);
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--nageeb-secondary);
+        outline-offset: 2px;
+    }
+
+    /* IBM Plex Mono للأرقام */
+    .num,
+    [data-numeric],
+    .tabular-nums {
+        font-family: var(--nageeb-font-mono);
+        font-variant-numeric: tabular-nums;
+    }
+
+    input[type="number"],
+    input[type="tel"],
+    .stat-value,
+    .price,
+    .score {
+        font-family: var(--nageeb-font-mono);
+        font-variant-numeric: tabular-nums;
+    }
+}

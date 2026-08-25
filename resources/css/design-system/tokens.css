@@ -1,0 +1,83 @@
+/**
+ * نجيب (Nageeb) — Design System Tokens
+ * متغيرات قابلة لإعادة الاستخدام عبر كل صفحات المنصة
+ */
+
+:root {
+    /* ── Brand Colors ── */
+    --nageeb-primary: #4B2E83;
+    --nageeb-primary-hover: #3D2469;
+    --nageeb-primary-light: #6B4DA3;
+    --nageeb-primary-muted: rgba(75, 46, 131, 0.08);
+
+    --nageeb-secondary: #C9A24B;
+    --nageeb-secondary-hover: #B8923F;
+    --nageeb-secondary-light: #D4B56A;
+    --nageeb-secondary-muted: rgba(201, 162, 75, 0.12);
+
+    --nageeb-support: #7BA895;
+    --nageeb-support-hover: #6A9784;
+    --nageeb-support-light: #95BAA9;
+    --nageeb-support-muted: rgba(123, 168, 149, 0.12);
+
+    --nageeb-background: #FAF9F6;
+    --nageeb-surface: #FFFFFF;
+    --nageeb-surface-muted: #F3F1EC;
+
+    --nageeb-text: #1E1B2E;
+    --nageeb-text-muted: #5C5869;
+    --nageeb-text-dim: #8A8699;
+    --nageeb-text-inverse: #FAF9F6;
+
+    --nageeb-alert: #B5504A;
+    --nageeb-alert-hover: #9E4540;
+    --nageeb-alert-muted: rgba(181, 80, 74, 0.1);
+
+    /* ── Borders & Shadows ── */
+    --nageeb-border: rgba(30, 27, 46, 0.1);
+    --nageeb-border-strong: rgba(30, 27, 46, 0.18);
+    --nageeb-shadow-sm: 0 2px 8px rgba(30, 27, 46, 0.04);
+    --nageeb-shadow-md: 0 8px 24px rgba(30, 27, 46, 0.06);
+    --nageeb-shadow-lg: 0 16px 40px rgba(30, 27, 46, 0.08);
+
+    /* ── Typography ── */
+    --nageeb-font-sans: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
+    --nageeb-font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+
+    --nageeb-text-xs: 0.75rem;
+    --nageeb-text-sm: 0.875rem;
+    --nageeb-text-base: 1rem;
+    --nageeb-text-lg: 1.125rem;
+    --nageeb-text-xl: 1.25rem;
+    --nageeb-text-2xl: 1.5rem;
+    --nageeb-text-3xl: 1.875rem;
+    --nageeb-text-4xl: 2.25rem;
+
+    --nageeb-leading-tight: 1.25;
+    --nageeb-leading-normal: 1.7;
+    --nageeb-leading-relaxed: 1.85;
+
+    /* ── Spacing ── */
+    --nageeb-space-1: 0.25rem;
+    --nageeb-space-2: 0.5rem;
+    --nageeb-space-3: 0.75rem;
+    --nageeb-space-4: 1rem;
+    --nageeb-space-5: 1.5rem;
+    --nageeb-space-6: 2rem;
+    --nageeb-space-7: 3rem;
+    --nageeb-space-8: 4rem;
+
+    /* ── Radius ── */
+    --nageeb-radius-sm: 6px;
+    --nageeb-radius-md: 10px;
+    --nageeb-radius-lg: 14px;
+    --nageeb-radius-xl: 20px;
+    --nageeb-radius-full: 9999px;
+
+    /* ── Layout ── */
+    --nageeb-container-max: 1200px;
+
+    /* ── Motion ── */
+    --nageeb-transition-fast: 0.15s ease;
+    --nageeb-transition-normal: 0.25s ease;
+}
