@@ -6,7 +6,7 @@
 <div class="min-h-screen">
     {{-- Header --}}
     <header class="bg-primary text-text-inverse">
-        <div class="nageeb-container py-6 flex items-center justify-between">
+        <div class="nageeb-container py-6 flex items-center justify-between gap-4 flex-wrap">
             <div>
                 <h1 class="text-2xl font-bold">نجيب</h1>
                 <p class="text-sm opacity-80 mt-1">منصة تعليمية إلكترونية</p>

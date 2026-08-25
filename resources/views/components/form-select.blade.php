@@ -16,6 +16,6 @@
         {{ $slot }}
     </select>
     @error($name)
-        <p class="nageeb-field-error">{{ $message }}</p>
+        <p class="nageeb-field-error" role="alert">{{ $message }}</p>
     @enderror
 </div>

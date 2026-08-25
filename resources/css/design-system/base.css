@@ -6,7 +6,7 @@
 @layer base {
     html {
         direction: rtl;
-        text-align: right;
+        text-align: start;
         scroll-behavior: smooth;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
@@ -69,5 +69,9 @@
     .score {
         font-family: var(--nageeb-font-mono);
         font-variant-numeric: tabular-nums;
+    }
+
+    [x-cloak] {
+        display: none !important;
     }
 }

@@ -1,7 +1,11 @@
-@props(['label', 'name', 'type' => 'text', 'required' => false, 'value' => null])
+@props(['label', 'name', 'type' => 'text', 'required' => false, 'value' => null, 'id' => null])
+
+@php
+    $fieldId = $id ?? $name;
+@endphp
 
 <div class="nageeb-field">
-    <label for="{{ $name }}" class="nageeb-label">
+    <label for="{{ $fieldId }}" class="nageeb-label">
         {{ $label }}
         @if ($required)
             <span class="text-alert">*</span>
@@ -9,13 +13,13 @@
     </label>
     <input
         type="{{ $type }}"
-        id="{{ $name }}"
+        id="{{ $fieldId }}"
         name="{{ $name }}"
         value="{{ old($name, $value) }}"
         @if ($required) required @endif
         {{ $attributes->merge(['class' => 'nageeb-input']) }}
     />
     @error($name)
-        <p class="nageeb-field-error">{{ $message }}</p>
+        <p class="nageeb-field-error" role="alert">{{ $message }}</p>
     @enderror
 </div>

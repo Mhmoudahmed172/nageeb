@@ -30,7 +30,7 @@
 
     <x-slot:footer>
         لديك حساب بالفعل؟
-        <a href="{{ route('login') }}" class="text-primary font-medium hover:underline mr-1">
+        <a href="{{ route('login') }}" class="text-primary font-medium hover:underline ms-1">
             تسجيل الدخول
         </a>
     </x-slot:footer>

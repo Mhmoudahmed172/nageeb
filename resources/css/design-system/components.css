@@ -231,4 +231,51 @@
         font-size: var(--nageeb-text-xs);
         color: var(--nageeb-text-dim);
     }
+
+    .nageeb-table-wrap {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nageeb-empty {
+        text-align: center;
+        padding-block: var(--nageeb-space-8, 2rem);
+        padding-inline: var(--nageeb-space-4);
+    }
+
+    .nageeb-empty__title {
+        color: var(--nageeb-text-muted);
+        font-size: var(--nageeb-text-base);
+        margin: 0;
+    }
+
+    .nageeb-empty__body {
+        margin-top: 0.5rem;
+        color: var(--nageeb-text-dim);
+        font-size: var(--nageeb-text-sm);
+    }
+
+    .nageeb-dropdown {
+        inset-inline-end: 0;
+        inset-inline-start: auto;
+        text-align: start;
+        max-width: min(20rem, calc(100vw - 1.5rem));
+        width: min(20rem, calc(100vw - 1.5rem));
+    }
+
+    .nageeb-modal {
+        text-align: start;
+        max-height: min(90vh, 40rem);
+        overflow: auto;
+    }
+
+    .nageeb-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
 }

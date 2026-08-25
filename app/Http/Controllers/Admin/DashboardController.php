@@ -7,10 +7,8 @@ use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function __invoke(): View
+    public function __invoke(OverviewController $overview): View
     {
-        return view('dashboards.admin', [
-            'user' => auth()->user(),
-        ]);
+        return $overview->index();
     }
 }
