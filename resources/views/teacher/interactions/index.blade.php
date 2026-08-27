@@ -9,10 +9,10 @@
     @endif
 
     @forelse ($questions as $question)
-        <article class="nageeb-card mb-4">
+        <article id="question-{{ $question->id }}" class="nageeb-card mb-4">
             <p class="text-sm nageeb-text-dim mb-1">{{ $question->created_at->format('Y/m/d H:i') }}</p>
             <p class="font-medium">{{ $question->user->name }}</p>
-            <p class="nageeb-text-muted text-sm mb-2">الدرس: {{ $question->lesson->title }} — {{ $question->lesson->unit->course->title }}</p>
+            <p class="nageeb-text-muted text-sm mb-2">الدرس: {{ $question->lesson->title }} — {{ $question->lesson->unit->semester->course->title }}</p>
             <p class="mb-4">{{ $question->message }}</p>
 
             @foreach ($question->replies as $reply)
@@ -40,3 +40,11 @@
     @endforelse
 </x-dashboard-layout>
 @endsection
+
+@if ($focusQuestionId ?? null)
+@push('scripts')
+<script>
+    document.getElementById('question-{{ (int) $focusQuestionId }}')?.scrollIntoView({ block: 'center' });
+</script>
+@endpush
+@endif

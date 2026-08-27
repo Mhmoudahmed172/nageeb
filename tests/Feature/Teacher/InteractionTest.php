@@ -23,7 +23,7 @@ class InteractionTest extends TestCase
         $teacher = User::factory()->teacher()->create();
         $student = User::factory()->student()->create();
         $course = Course::factory()->create(['teacher_id' => $teacher->id]);
-        $unit = Unit::factory()->create(['course_id' => $course->id]);
+        $unit = Unit::factory()->forCourse($course)->create();
         $lesson = Lesson::factory()->create(['unit_id' => $unit->id]);
         $question = Comment::factory()->create([
             'lesson_id' => $lesson->id,

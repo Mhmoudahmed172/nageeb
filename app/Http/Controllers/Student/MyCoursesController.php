@@ -6,37 +6,64 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Student\StoreLessonCommentRequest;
 use App\Models\Comment;
 use App\Models\Course;
-use App\Models\Enrollment;
 use App\Models\Lesson;
+use App\Models\LessonView;
+use App\Support\ContentAccess;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class MyCoursesController extends Controller
 {
+    public function __construct(private readonly ContentAccess $contentAccess) {}
+
     public function index(): View
     {
         $courses = Course::query()
             ->with('teacher')
-            ->whereHas(
-                'enrollments',
-                fn ($query) => $query->where('student_id', auth()->id())->active(),
-            )
+            ->where(function ($query) {
+                $query->whereHas(
+                    'enrollments',
+                    fn ($enrollments) => $enrollments->where('student_id', auth()->id())->active(),
+                )->orWhere(function ($free) {
+                    $free->where('is_free', true)->where('status', 'live');
+                });
+            })
             ->latest()
-            ->get();
+            ->get()
+            ->filter(fn (Course $course) => $course->studentHasAccess(auth()->user()))
+            ->values();
 
         return view('student.my-courses.index', compact('courses'));
     }
 
     public function show(Request $request, Course $course): View
     {
-        $this->ensureActiveEnrollment($course);
+        $this->ensureCourseAccess($course);
 
-        $course->load(['units.lessons.attachments', 'teacher']);
+        $course->load(['semesters.units.lessons.contents.regions', 'teacher']);
+        $user = auth()->user();
 
-        $lessons = $course->units->flatMap->lessons->values();
+        $semesters = $course->semesters
+            ->filter(fn ($semester) => $this->contentAccess->studentCanAccessSemester($user, $semester))
+            ->values();
+
+        $lessons = $semesters
+            ->flatMap(fn ($semester) => $semester->units->flatMap->lessons)
+            ->filter(fn (Lesson $lesson) => $this->contentAccess->studentCanAccessLesson($user, $lesson))
+            ->values();
+
         $currentLessonId = (int) $request->query('lesson');
         $currentLesson = $lessons->firstWhere('id', $currentLessonId) ?? $lessons->first();
+
+        if ($currentLesson) {
+            $currentLesson->setRelation(
+                'contents',
+                $currentLesson->contents->filter(
+                    fn ($content) => $this->contentAccess->studentCanAccessContent($user, $content),
+                )->values(),
+            );
+        }
 
         $currentIndex = $currentLesson
             ? $lessons->search(fn (Lesson $lesson) => $lesson->id === $currentLesson->id)
@@ -58,6 +85,20 @@ class MyCoursesController extends Controller
                 ->get()
             : collect();
 
+        if ($currentLesson) {
+            auth()->user()->studentProfile()?->update([
+                'last_viewed_lesson_id' => $currentLesson->id,
+            ]);
+
+            LessonView::query()->updateOrCreate(
+                [
+                    'student_id' => auth()->id(),
+                    'lesson_id' => $currentLesson->id,
+                ],
+                ['viewed_at' => now()],
+            );
+        }
+
         return view('student.my-courses.show', [
             'course' => $course,
             'lessons' => $lessons,
@@ -70,8 +111,9 @@ class MyCoursesController extends Controller
 
     public function storeComment(StoreLessonCommentRequest $request, Course $course, Lesson $lesson): RedirectResponse
     {
-        $this->ensureActiveEnrollment($course);
-        abort_unless($lesson->unit->course_id === $course->id, 404);
+        $this->ensureCourseAccess($course);
+        abort_unless($lesson->belongsToCourse($course), 404);
+        abort_unless($this->contentAccess->studentCanAccessLesson(auth()->user(), $lesson), 403);
 
         Comment::query()->create([
             'lesson_id' => $lesson->id,
@@ -85,15 +127,8 @@ class MyCoursesController extends Controller
             ->with('status', 'تم إرسال سؤالك.');
     }
 
-    private function ensureActiveEnrollment(Course $course): void
+    private function ensureCourseAccess(Course $course): void
     {
-        abort_unless(
-            Enrollment::query()
-                ->where('student_id', auth()->id())
-                ->where('course_id', $course->id)
-                ->active()
-                ->exists(),
-            403,
-        );
+        abort_unless($this->contentAccess->studentCanAccessCourse(auth()->user(), $course), 403);
     }
 }

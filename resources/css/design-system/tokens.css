@@ -4,41 +4,57 @@
  */
 
 :root {
-    /* ── Brand Colors ── */
-    --nageeb-primary: #4B2E83;
-    --nageeb-primary-hover: #3D2469;
-    --nageeb-primary-light: #6B4DA3;
-    --nageeb-primary-muted: rgba(75, 46, 131, 0.08);
+    color-scheme: light;
 
-    --nageeb-secondary: #C9A24B;
-    --nageeb-secondary-hover: #B8923F;
-    --nageeb-secondary-light: #D4B56A;
-    --nageeb-secondary-muted: rgba(201, 162, 75, 0.12);
+    /* Brand and semantic colors */
+    --nageeb-primary: #2457D6;
+    --nageeb-primary-hover: #1D46B2;
+    --nageeb-primary-light: #4E78E4;
+    --nageeb-primary-muted: #EEF3FF;
+    --nageeb-accent: #F4A62A;
+    --nageeb-accent-hover: #D98B12;
+    --nageeb-accent-muted: #FFF7E8;
 
-    --nageeb-support: #7BA895;
-    --nageeb-support-hover: #6A9784;
-    --nageeb-support-light: #95BAA9;
-    --nageeb-support-muted: rgba(123, 168, 149, 0.12);
+    /* Backwards-compatible aliases */
+    --nageeb-secondary: var(--nageeb-accent);
+    --nageeb-secondary-hover: var(--nageeb-accent-hover);
+    --nageeb-secondary-light: #FFC45F;
+    --nageeb-secondary-muted: var(--nageeb-accent-muted);
+    --nageeb-support: #168466;
+    --nageeb-support-hover: #106B53;
+    --nageeb-support-light: #51A991;
+    --nageeb-support-muted: #EAF8F4;
 
-    --nageeb-background: #FAF9F6;
+    --nageeb-background: #F6F8FC;
     --nageeb-surface: #FFFFFF;
-    --nageeb-surface-muted: #F3F1EC;
+    --nageeb-surface-muted: #F0F3F8;
+    --nageeb-surface-raised: #FFFFFF;
+    --nageeb-text: #172033;
+    --nageeb-text-muted: #5F6B7E;
+    --nageeb-text-dim: #8A95A6;
+    --nageeb-text-inverse: #FFFFFF;
+    --nageeb-border: #E1E6EF;
+    --nageeb-border-strong: #CBD3E1;
 
-    --nageeb-text: #1E1B2E;
-    --nageeb-text-muted: #5C5869;
-    --nageeb-text-dim: #8A8699;
-    --nageeb-text-inverse: #FAF9F6;
+    --nageeb-success: #168466;
+    --nageeb-success-muted: #EAF8F4;
+    --nageeb-warning: #B66B09;
+    --nageeb-warning-muted: #FFF6E5;
+    --nageeb-danger: #C53B46;
+    --nageeb-danger-hover: #A92E38;
+    --nageeb-danger-muted: #FFF0F1;
+    --nageeb-info: #2563C7;
+    --nageeb-info-muted: #EDF4FF;
+    --nageeb-alert: var(--nageeb-danger);
+    --nageeb-alert-hover: var(--nageeb-danger-hover);
+    --nageeb-alert-muted: var(--nageeb-danger-muted);
 
-    --nageeb-alert: #B5504A;
-    --nageeb-alert-hover: #9E4540;
-    --nageeb-alert-muted: rgba(181, 80, 74, 0.1);
-
-    /* ── Borders & Shadows ── */
-    --nageeb-border: rgba(30, 27, 46, 0.1);
-    --nageeb-border-strong: rgba(30, 27, 46, 0.18);
-    --nageeb-shadow-sm: 0 2px 8px rgba(30, 27, 46, 0.04);
-    --nageeb-shadow-md: 0 8px 24px rgba(30, 27, 46, 0.06);
-    --nageeb-shadow-lg: 0 16px 40px rgba(30, 27, 46, 0.08);
+    /* Elevation */
+    --nageeb-shadow-xs: 0 1px 2px rgb(23 32 51 / 0.04);
+    --nageeb-shadow-sm: 0 1px 3px rgb(23 32 51 / 0.06), 0 1px 2px rgb(23 32 51 / 0.03);
+    --nageeb-shadow-md: 0 8px 24px rgb(23 32 51 / 0.08);
+    --nageeb-shadow-lg: 0 20px 48px rgb(23 32 51 / 0.12);
+    --nageeb-ring: 0 0 0 3px rgb(36 87 214 / 0.16);
 
     /* ── Typography ── */
     --nageeb-font-sans: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
@@ -52,6 +68,7 @@
     --nageeb-text-2xl: 1.5rem;
     --nageeb-text-3xl: 1.875rem;
     --nageeb-text-4xl: 2.25rem;
+    --nageeb-text-5xl: 3rem;
 
     --nageeb-leading-tight: 1.25;
     --nageeb-leading-normal: 1.7;
@@ -66,18 +83,24 @@
     --nageeb-space-6: 2rem;
     --nageeb-space-7: 3rem;
     --nageeb-space-8: 4rem;
+    --nageeb-space-9: 6rem;
 
     /* ── Radius ── */
-    --nageeb-radius-sm: 6px;
-    --nageeb-radius-md: 10px;
-    --nageeb-radius-lg: 14px;
-    --nageeb-radius-xl: 20px;
+    --nageeb-radius-sm: 0.375rem;
+    --nageeb-radius-md: 0.625rem;
+    --nageeb-radius-lg: 0.875rem;
+    --nageeb-radius-xl: 1.25rem;
     --nageeb-radius-full: 9999px;
 
     /* ── Layout ── */
-    --nageeb-container-max: 1200px;
+    --nageeb-container-sm: 42rem;
+    --nageeb-container-md: 64rem;
+    --nageeb-container-max: 90rem;
+    --nageeb-sidebar-width: 17rem;
+    --nageeb-topbar-height: 4.5rem;
 
     /* ── Motion ── */
-    --nageeb-transition-fast: 0.15s ease;
-    --nageeb-transition-normal: 0.25s ease;
+    --nageeb-transition-fast: 140ms cubic-bezier(.2, .8, .2, 1);
+    --nageeb-transition-normal: 220ms cubic-bezier(.2, .8, .2, 1);
+    --nageeb-transition-slow: 360ms cubic-bezier(.2, .8, .2, 1);
 }

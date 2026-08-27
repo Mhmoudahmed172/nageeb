@@ -21,7 +21,7 @@ class SubscriptionRequestController extends Controller
         $statusFilter = $request->query('status');
 
         $requests = SubscriptionRequest::query()
-            ->with(['student', 'course', 'package'])
+            ->with(['student', 'course', 'package', 'accessPlan'])
             ->whereHas('course', fn ($query) => $query->where('teacher_id', auth()->id()))
             ->when(
                 in_array($statusFilter, ['pending', 'approved', 'rejected'], true),
@@ -38,27 +38,39 @@ class SubscriptionRequestController extends Controller
 
     public function approve(SubscriptionRequest $subscriptionRequest): RedirectResponse
     {
-        $this->authorizeRequest($subscriptionRequest);
+        abort_unless($subscriptionRequest->course->teacher_id === auth()->id(), 403);
         abort_unless($subscriptionRequest->status === SubscriptionRequestStatus::Pending, 422);
+        abort_unless($subscriptionRequest->access_plan_id, 422);
 
-        DB::transaction(function () use ($subscriptionRequest) {
+        $subscriptionRequest->load(['accessPlan.prices', 'student.studentProfile.region']);
+
+        $plan = $subscriptionRequest->accessPlan;
+        abort_unless($plan && $plan->course_id === $subscriptionRequest->course_id, 422);
+
+        $region = $subscriptionRequest->student->studentProfile?->region;
+        $price = $plan->priceFor($region);
+        $duration = $plan->access_duration_days;
+
+        DB::transaction(function () use ($subscriptionRequest, $plan, $region, $price, $duration) {
             $subscriptionRequest->update([
                 'status' => SubscriptionRequestStatus::Approved,
                 'reviewed_at' => now(),
                 'rejection_reason' => null,
             ]);
 
-            Enrollment::query()->firstOrCreate(
-                [
-                    'student_id' => $subscriptionRequest->student_id,
-                    'course_id' => $subscriptionRequest->course_id,
-                ],
-                [
-                    'granted_by' => auth()->id(),
-                    'granted_at' => now(),
-                    'expires_at' => null,
-                ],
-            );
+            Enrollment::query()->create([
+                'student_id' => $subscriptionRequest->student_id,
+                'course_id' => $subscriptionRequest->course_id,
+                'access_plan_id' => $plan->id,
+                'region_id' => $region?->id,
+                'amount_paid' => $price?->effectivePrice(),
+                'currency' => $price?->currency ?? 'ILS',
+                'granted_by' => auth()->id(),
+                'granted_at' => now(),
+                'starts_at' => now(),
+                'expires_at' => $duration ? now()->addDays((int) $duration) : null,
+                'status' => 'active',
+            ]);
         });
 
         $subscriptionRequest->load('course');
@@ -71,7 +83,7 @@ class SubscriptionRequestController extends Controller
 
     public function reject(RejectSubscriptionRequestRequest $request, SubscriptionRequest $subscriptionRequest): RedirectResponse
     {
-        $this->authorizeRequest($subscriptionRequest);
+        abort_unless($subscriptionRequest->course->teacher_id === auth()->id(), 403);
         abort_unless($subscriptionRequest->status === SubscriptionRequestStatus::Pending, 422);
 
         $subscriptionRequest->update([
@@ -86,10 +98,5 @@ class SubscriptionRequestController extends Controller
         return redirect()
             ->route('teacher.subscription-requests.index')
             ->with('status', 'تم رفض الطلب.');
-    }
-
-    private function authorizeRequest(SubscriptionRequest $subscriptionRequest): void
-    {
-        abort_unless($subscriptionRequest->course->teacher_id === auth()->id(), 403);
     }
 }

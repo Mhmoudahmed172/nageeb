@@ -12,15 +12,15 @@
         تفاصيل المادة
     </a>
     <a
-        href="#"
+        href="{{ route('teacher.courses.content', $course) }}"
         @class([
             'px-4 py-2 text-sm font-medium',
             'bg-primary text-text-inverse' => $active === 'content',
             'text-text hover:bg-primary-muted' => $active !== 'content',
         ])
-        aria-disabled="true"
+        @if ($active === 'content') aria-current="page" @endif
     >
-        محتوى المادة
+        الوحدات والدروس
     </a>
     <a
         href="{{ route('teacher.courses.packages.index', $course) }}"
@@ -31,6 +31,6 @@
         ])
         @if ($active === 'packages') aria-current="page" @endif
     >
-        باقات الاشتراك
+        خطط الوصول
     </a>
 </nav>

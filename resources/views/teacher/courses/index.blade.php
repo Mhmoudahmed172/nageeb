@@ -9,8 +9,8 @@
     @endif
 
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-        <p class="nageeb-text-muted">أدر موادك ثم أضف باقات الاشتراك لكل مادة.</p>
-        <a href="{{ route('teacher.courses.create') }}" class="nageeb-btn nageeb-btn--primary self-start">مادة جديدة</a>
+        <p class="nageeb-text-muted">أدر موادك ثم أنشئ خطط الوصول والأسعار الخاصة بكل مادة.</p>
+        <a href="{{ route('teacher.courses.create') }}" class="nageeb-btn nageeb-btn--primary self-start">إضافة مادة</a>
     </div>
 
     <div class="nageeb-card nageeb-table-wrap">
@@ -32,8 +32,8 @@
                             <td class="py-3 px-2">{{ $course->status->label() }}</td>
                             <td class="py-3 px-2">
                                 <div class="flex flex-wrap gap-2">
-                                <a href="{{ route('teacher.courses.packages.index', $course) }}" class="nageeb-btn nageeb-btn--outline text-sm py-2 px-3">الباقات</a>
-                                <a href="{{ route('teacher.courses.edit', $course) }}" class="nageeb-btn nageeb-btn--secondary text-sm py-2 px-3">تعديل</a>
+                                <a href="{{ route('teacher.courses.content', $course) }}" class="nageeb-btn nageeb-btn--primary text-sm py-2 px-3">إدارة</a>
+                                <a href="{{ route('teacher.courses.edit', $course) }}" class="nageeb-btn nageeb-btn--outline text-sm py-2 px-3">تعديل</a>
                                 </div>
                             </td>
                         </tr>

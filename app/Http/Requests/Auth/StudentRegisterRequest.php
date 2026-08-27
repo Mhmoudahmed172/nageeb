@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\Auth;
 
-use App\Enums\StudentRegion;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -23,7 +22,7 @@ class StudentRegisterRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'phone' => ['required', 'string', 'max:20'],
-            'region' => ['required', Rule::enum(StudentRegion::class)],
+            'region_id' => ['required', 'integer', Rule::exists('regions', 'id')],
             'password' => ['required', 'confirmed', Password::defaults()],
         ];
     }
@@ -39,7 +38,7 @@ class StudentRegisterRequest extends FormRequest
             'email.email' => 'يرجى إدخال بريد إلكتروني صحيح.',
             'email.unique' => 'هذا البريد الإلكتروني مسجّل مسبقاً.',
             'phone.required' => 'رقم الجوال مطلوب.',
-            'region.required' => 'يرجى اختيار المنطقة.',
+            'region_id.required' => 'يرجى اختيار المنطقة.',
             'password.required' => 'كلمة المرور مطلوبة.',
             'password.confirmed' => 'تأكيد كلمة المرور غير متطابق.',
         ];

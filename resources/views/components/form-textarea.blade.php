@@ -1,4 +1,4 @@
-@props(['label', 'name', 'required' => false, 'value' => null, 'rows' => 4, 'id' => null])
+@props(['label', 'name', 'required' => false, 'value' => null, 'rows' => 4, 'id' => null, 'help' => null])
 
 @php
     $fieldId = $id ?? $name;
@@ -15,9 +15,11 @@
         id="{{ $fieldId }}"
         name="{{ $name }}"
         rows="{{ $rows }}"
+        aria-invalid="{{ $errors->has($name) ? 'true' : 'false' }}"
         @if ($required) required @endif
-        {{ $attributes->merge(['class' => 'nageeb-input']) }}
+        {{ $attributes->merge(['class' => 'nageeb-input nageeb-textarea']) }}
     >{{ old($name, $value) }}</textarea>
+    @if ($help)<p class="nageeb-field-help">{{ $help }}</p>@endif
     @error($name)
         <p class="nageeb-field-error" role="alert">{{ $message }}</p>
     @enderror

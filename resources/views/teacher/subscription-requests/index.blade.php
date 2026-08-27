@@ -41,7 +41,7 @@
                     <tr class="border-b border-border">
                         <th class="py-3 px-2 font-medium">الطالب</th>
                         <th class="py-3 px-2 font-medium">المادة</th>
-                        <th class="py-3 px-2 font-medium">الباقة</th>
+                        <th class="py-3 px-2 font-medium">خطة الوصول</th>
                         <th class="py-3 px-2 font-medium">تاريخ الطلب</th>
                         <th class="py-3 px-2 font-medium">الإيصال</th>
                         <th class="py-3 px-2 font-medium">الحالة</th>
@@ -53,7 +53,7 @@
                         <tr class="border-b border-border last:border-0 align-top">
                             <td class="py-3 px-2">{{ $item->student->name }}</td>
                             <td class="py-3 px-2">{{ $item->course->title }}</td>
-                            <td class="py-3 px-2">{{ $item->package->name }}</td>
+                            <td class="py-3 px-2">{{ $item->accessPlan?->title ?? $item->package?->name }}</td>
                             <td class="py-3 px-2">{{ $item->created_at->format('Y/m/d') }}</td>
                             <td class="py-3 px-2">
                                 @if ($item->receiptIsPdf())

@@ -6,6 +6,7 @@ use App\Enums\LessonContentType;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Lesson;
+use App\Models\LessonContent;
 use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -53,11 +54,16 @@ class MyCoursesTest extends TestCase
     {
         $student = User::factory()->student()->create();
         $course = Course::factory()->create();
-        $unit = Unit::factory()->create(['course_id' => $course->id]);
+        $unit = Unit::factory()->forCourse($course)->create();
         $lesson = Lesson::factory()->create([
             'unit_id' => $unit->id,
             'title' => 'الدرس الأول',
-            'content_type' => LessonContentType::ExternalLink,
+        ]);
+        LessonContent::factory()->create([
+            'lesson_id' => $lesson->id,
+            'type' => LessonContentType::Link,
+            'position' => 1,
+            'data' => ['url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'],
         ]);
         Enrollment::factory()->create([
             'student_id' => $student->id,

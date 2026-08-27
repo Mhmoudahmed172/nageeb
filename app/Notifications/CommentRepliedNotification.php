@@ -31,7 +31,7 @@ class CommentRepliedNotification extends Notification
             'title' => 'رد جديد على سؤالك',
             'body' => 'رد المعلّم على سؤالك في درس «'.$lesson->title.'».',
             'url' => route('student.my-courses.show', [
-                'course' => $lesson->unit->course_id,
+                'course' => $lesson->unit->semester->course_id,
                 'lesson' => $lesson->id,
             ]),
         ];

@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Enums\StudentRegion;
 use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -35,7 +34,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $student->studentProfile()->create([
-            'region' => StudentRegion::Gaza,
+            'region_id' => \App\Models\Region::query()->where('code', 'gaza')->value('id'),
         ]);
     }
 }

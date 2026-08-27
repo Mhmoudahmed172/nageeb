@@ -23,6 +23,9 @@
     --color-secondary-hover: var(--nageeb-secondary-hover);
     --color-secondary-light: var(--nageeb-secondary-light);
     --color-secondary-muted: var(--nageeb-secondary-muted);
+    --color-accent: var(--nageeb-accent);
+    --color-accent-hover: var(--nageeb-accent-hover);
+    --color-accent-muted: var(--nageeb-accent-muted);
 
     --color-support: var(--nageeb-support);
     --color-support-hover: var(--nageeb-support-hover);
@@ -41,6 +44,14 @@
     --color-alert: var(--nageeb-alert);
     --color-alert-hover: var(--nageeb-alert-hover);
     --color-alert-muted: var(--nageeb-alert-muted);
+    --color-success: var(--nageeb-success);
+    --color-success-muted: var(--nageeb-success-muted);
+    --color-warning: var(--nageeb-warning);
+    --color-warning-muted: var(--nageeb-warning-muted);
+    --color-danger: var(--nageeb-danger);
+    --color-danger-muted: var(--nageeb-danger-muted);
+    --color-info: var(--nageeb-info);
+    --color-info-muted: var(--nageeb-info-muted);
 
     --color-border: var(--nageeb-border);
     --color-border-strong: var(--nageeb-border-strong);

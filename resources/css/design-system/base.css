@@ -10,6 +10,7 @@
         scroll-behavior: smooth;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
     }
 
     body {
@@ -18,6 +19,7 @@
         line-height: var(--nageeb-leading-normal);
         color: var(--nageeb-text);
         background-color: var(--nageeb-background);
+        min-width: 20rem;
     }
 
     h1, h2, h3, h4, h5, h6 {
@@ -25,6 +27,19 @@
         font-weight: 600;
         line-height: var(--nageeb-leading-tight);
         color: var(--nageeb-text);
+    }
+
+    button:not(:disabled),
+    [role="button"]:not([aria-disabled="true"]) {
+        cursor: pointer;
+    }
+
+    button:disabled,
+    input:disabled,
+    select:disabled,
+    textarea:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
     }
 
     a {
@@ -50,8 +65,19 @@
     }
 
     :focus-visible {
-        outline: 2px solid var(--nageeb-secondary);
+        outline: 2px solid var(--nageeb-primary);
         outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            scroll-behavior: auto !important;
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
     }
 
     /* IBM Plex Mono للأرقام */

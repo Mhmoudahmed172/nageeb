@@ -9,8 +9,8 @@
         <p class="nageeb-text-muted">المعلّم: {{ $course->teacher->name }}</p>
     </div>
 
-    @if ($course->packages->isEmpty())
-        <div class="nageeb-alert nageeb-alert--warning max-w-2xl">لا توجد باقات متاحة لهذه المادة حالياً.</div>
+    @if ($course->accessPlans->isEmpty())
+        <div class="nageeb-alert nageeb-alert--warning max-w-2xl">لا توجد خطط متاحة لهذه المادة حالياً.</div>
     @elseif (! $region)
         <div class="nageeb-alert nageeb-alert--warning max-w-2xl">تعذر تحديد منطقتك. أكمل ملفك الشخصي أولاً.</div>
     @else
@@ -18,24 +18,30 @@
             @csrf
 
             <fieldset class="grid gap-3">
-                <legend class="nageeb-label mb-2">اختر الباقة</legend>
-                @foreach ($course->packages as $package)
+                <legend class="nageeb-label mb-2">اختر خطة الوصول</legend>
+                @foreach ($course->accessPlans as $plan)
+                    @php $price = $plan->priceFor($region); @endphp
                     <label class="flex items-start gap-3 border border-border p-4 cursor-pointer">
                         <input
                             type="radio"
-                            name="package_id"
-                            value="{{ $package->id }}"
+                            name="access_plan_id"
+                            value="{{ $plan->id }}"
                             class="mt-1"
                             required
-                            @checked(old('package_id') == $package->id)
+                            @checked(old('access_plan_id') == $plan->id)
                         >
                         <span>
-                            <span class="block font-medium">{{ $package->name }}</span>
-                            <span class="nageeb-text-muted text-sm">{{ $package->duration_label }} — {{ number_format($package->priceFor($region), 2) }} ₪</span>
+                            <span class="block font-medium">{{ $plan->title }}</span>
+                            <span class="nageeb-text-muted text-sm">
+                                {{ $plan->semesters->pluck('title')->join('، ') }}
+                                @if ($price)
+                                    — {{ number_format((float) $price->effectivePrice(), 2) }} ₪
+                                @endif
+                            </span>
                         </span>
                     </label>
                 @endforeach
-                @error('package_id')
+                @error('access_plan_id')
                     <p class="nageeb-field-error">{{ $message }}</p>
                 @enderror
             </fieldset>

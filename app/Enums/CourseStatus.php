@@ -12,8 +12,8 @@ enum CourseStatus: string
     {
         return match ($this) {
             self::Draft => 'مسودة',
-            self::Live => 'منشورة',
-            self::Archived => 'مؤرشفة',
+            self::Live => 'مباشر',
+            self::Archived => 'مؤرشف',
         };
     }
 }

@@ -15,7 +15,9 @@ class StudentRegisterController extends Controller
 {
     public function create(): View
     {
-        return view('auth.register-student');
+        return view('auth.register-student', [
+            'regions' => \App\Models\Region::query()->active()->get(),
+        ]);
     }
 
     public function store(StudentRegisterRequest $request): RedirectResponse
@@ -29,7 +31,7 @@ class StudentRegisterController extends Controller
         ]);
 
         $user->studentProfile()->create([
-            'region' => $request->input('region'),
+            'region_id' => $request->integer('region_id'),
         ]);
 
         event(new Registered($user));

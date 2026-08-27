@@ -3,7 +3,6 @@
 namespace Tests\Feature\Admin;
 
 use App\Enums\PayoutRequestStatus;
-use App\Enums\StudentRegion;
 use App\Enums\SubscriptionRequestStatus;
 use App\Models\Course;
 use App\Models\Enrollment;
@@ -23,7 +22,7 @@ class AdminPanelTest extends TestCase
         $admin = User::factory()->admin()->create();
         $teacher = User::factory()->teacher()->create();
         $student = User::factory()->student()->create();
-        $student->studentProfile()->create(['region' => StudentRegion::Gaza]);
+        $student->studentProfile()->create(['region_id' => $this->regionId()]);
         $course = Course::factory()->create(['teacher_id' => $teacher->id]);
         $package = SubscriptionPackage::factory()->create([
             'course_id' => $course->id,
@@ -33,6 +32,7 @@ class AdminPanelTest extends TestCase
             'student_id' => $student->id,
             'course_id' => $course->id,
             'granted_by' => $teacher->id,
+            'amount_paid' => 40,
         ]);
         SubscriptionRequest::factory()->create([
             'student_id' => $student->id,
@@ -45,7 +45,7 @@ class AdminPanelTest extends TestCase
         $this->actingAs($admin)
             ->get(route('admin.dashboard'))
             ->assertOk()
-            ->assertSee('إجمالي المعلمين')
+            ->assertSee('المعلمون')
             ->assertSee('40.00');
     }
 

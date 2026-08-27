@@ -4,14 +4,26 @@ namespace App\Enums;
 
 enum LessonContentType: string
 {
-    case UploadedVideo = 'uploaded_video';
-    case ExternalLink = 'external_link';
+    case Video = 'video';
+    case Text = 'text';
+    case File = 'file';
+    case Audio = 'audio';
+    case Link = 'link';
+    case Quiz = 'quiz';
+    case Assignment = 'assignment';
+    case LiveSession = 'live_session';
 
     public function label(): string
     {
         return match ($this) {
-            self::UploadedVideo => 'فيديو مرفوع',
-            self::ExternalLink => 'رابط خارجي',
+            self::Video => 'فيديو',
+            self::Text => 'نص',
+            self::File => 'ملف',
+            self::Audio => 'صوت',
+            self::Link => 'رابط',
+            self::Quiz => 'اختبار',
+            self::Assignment => 'واجب',
+            self::LiveSession => 'حصة مباشرة',
         };
     }
 }

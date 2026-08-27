@@ -12,7 +12,7 @@
                 <article class="nageeb-card">
                     <h2 class="font-semibold mb-2">{{ $course->title }}</h2>
                     <p class="nageeb-text-muted text-sm mb-4">{{ $course->teacher->name }}</p>
-                    <a href="{{ route('courses.subscribe', $course) }}" class="nageeb-btn nageeb-btn--primary text-sm">الاشتراك</a>
+                    <a href="{{ $course->is_free ? route('student.my-courses.show', $course) : route('courses.subscribe', $course) }}" class="nageeb-btn nageeb-btn--primary text-sm">{{ $course->is_free ? 'دخول مجاني' : 'الاشتراك' }}</a>
                 </article>
             @endforeach
         </div>

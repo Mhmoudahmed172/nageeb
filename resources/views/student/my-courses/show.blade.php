@@ -11,9 +11,9 @@
     @if ($currentLesson)
         <div class="nageeb-card mb-8">
             <h2 class="font-semibold mb-4">{{ $currentLesson->title }}</h2>
-            @if ($currentLesson->content_type === \App\Enums\LessonContentType::UploadedVideo && $currentLesson->videoUrl())
+            @if ($currentLesson->videoUrl())
                 <video class="w-full bg-text" controls src="{{ $currentLesson->videoUrl() }}"></video>
-            @elseif ($currentLesson->content_type === \App\Enums\LessonContentType::ExternalLink && $currentLesson->embedUrl())
+            @elseif ($currentLesson->embedUrl())
                 <iframe class="w-full aspect-video" src="{{ $currentLesson->embedUrl() }}" allowfullscreen title="{{ $currentLesson->title }}"></iframe>
             @else
                 <p class="nageeb-text-muted">لا يوجد مصدر فيديو لهذا الدرس بعد.</p>
@@ -28,13 +28,13 @@
                 @endif
             </div>
 
-            @if ($currentLesson->attachments->isNotEmpty())
+            @if ($currentLesson->fileContents()->isNotEmpty())
                 <div class="mt-6">
                     <h3 class="font-medium mb-3">مرفقات الدرس</h3>
                     <ul class="grid gap-2">
-                        @foreach ($currentLesson->attachments as $attachment)
+                        @foreach ($currentLesson->fileContents() as $file)
                             <li>
-                                <a href="{{ $attachment->url() }}" download>{{ $attachment->name }}</a>
+                                <a href="{{ $file->fileUrl() }}" download>{{ $file->displayName() }}</a>
                             </li>
                         @endforeach
                     </ul>

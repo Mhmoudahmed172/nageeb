@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Teacher;
 
-use App\Enums\StudentRegion;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\User;
@@ -20,11 +19,11 @@ class EnrolledStudentTest extends TestCase
         $otherCourse = Course::factory()->create(['title' => 'كيمياء']);
 
         $gazaStudent = User::factory()->student()->create(['name' => 'خالد غزة']);
-        $gazaStudent->studentProfile()->create(['region' => StudentRegion::Gaza]);
+        $gazaStudent->studentProfile()->create(['region_id' => $this->regionId('gaza')]);
         $westStudent = User::factory()->student()->create(['name' => 'سارة ضفة']);
-        $westStudent->studentProfile()->create(['region' => StudentRegion::WestBankAbroad]);
+        $westStudent->studentProfile()->create(['region_id' => $this->regionId('west_bank')]);
         $otherStudent = User::factory()->student()->create(['name' => 'طالب آخر']);
-        $otherStudent->studentProfile()->create(['region' => StudentRegion::Gaza]);
+        $otherStudent->studentProfile()->create(['region_id' => $this->regionId('gaza')]);
 
         Enrollment::factory()->create([
             'student_id' => $gazaStudent->id,
@@ -52,7 +51,7 @@ class EnrolledStudentTest extends TestCase
         $this->actingAs($teacher)
             ->get(route('teacher.enrollments.index', [
                 'search' => 'خالد',
-                'region' => StudentRegion::Gaza->value,
+                'region' => 'gaza',
                 'course_id' => $course->id,
             ]))
             ->assertOk()

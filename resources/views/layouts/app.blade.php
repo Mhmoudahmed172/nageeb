@@ -13,5 +13,7 @@
 </head>
 <body class="bg-background text-text antialiased min-h-screen">
     @yield('content')
+    <x-toast />
+    @stack('scripts')
 </body>
 </html>

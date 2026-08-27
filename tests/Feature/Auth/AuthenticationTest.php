@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Auth;
 
-use App\Enums\StudentRegion;
 use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -25,7 +24,7 @@ class AuthenticationTest extends TestCase
             'name' => 'أحمد محمد',
             'email' => 'ahmad@example.com',
             'phone' => '0599123456',
-            'region' => StudentRegion::Gaza->value,
+            'region_id' => $this->regionId(),
             'password' => 'password123',
             'password_confirmation' => 'password123',
         ]);
@@ -39,7 +38,7 @@ class AuthenticationTest extends TestCase
 
         $user = User::where('email', 'ahmad@example.com')->first();
         $this->assertNotNull($user->studentProfile);
-        $this->assertSame(StudentRegion::Gaza, $user->studentProfile->region);
+        $this->assertSame($this->regionId(), $user->studentProfile->region_id);
     }
 
     public function test_teacher_registration_sets_is_verified_false(): void

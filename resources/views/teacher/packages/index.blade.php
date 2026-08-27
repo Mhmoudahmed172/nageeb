@@ -1,91 +1,109 @@
 @extends('layouts.app')
 
-@section('title', 'باقات الاشتراك — نجيب')
+@section('title', 'خطط الوصول — نجيب')
 
 @section('content')
-<x-dashboard-layout title="باقات الاشتراك — {{ $course->title }}" role-label="المعلّم" active-menu="packages">
-    @include('teacher.courses._tabs', ['course' => $course, 'active' => 'packages'])
+<x-course-workspace :course="$course" active="packages">
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-7">
+        <div>
+            <h2 class="nageeb-heading-2">خطط الوصول</h2>
+            <p class="nageeb-text-muted text-sm mt-1">حدّد كيف يحصل طلابك على فصول هذه المادة وبأي سعر لكل منطقة.</p>
+        </div>
+        <x-button x-on:click="$dispatch('open-modal', 'create-access-plan')">+ إنشاء خطة وصول</x-button>
+    </div>
 
-    @if (session('status'))
-        <div class="nageeb-alert nageeb-alert--success mb-6">{{ session('status') }}</div>
+    @if ($plans->isEmpty())
+        <x-card class="py-12 text-center">
+            <span class="mx-auto grid size-14 place-items-center rounded-xl bg-primary-muted text-primary mb-4">
+                <x-nav-icon name="subscription" class="size-7" />
+            </span>
+            <h3 class="nageeb-heading-2">أنشئ أول خطة وصول لهذه المادة.</h3>
+            <p class="nageeb-text-muted text-sm mt-2 mb-6">اختر الفصول المشمولة وحدد السعر المناسب لكل منطقة طالب.</p>
+            <x-button x-on:click="$dispatch('open-modal', 'create-access-plan')">+ إنشاء خطة وصول</x-button>
+        </x-card>
+    @else
+        <div class="access-plan-list">
+            <div class="access-plan-list__head">
+                <span>اسم الخطة</span>
+                <span>الفصول المشمولة</span>
+                <span>السعر حسب المنطقة</span>
+                <span>مدة الوصول</span>
+                <span>الحالة</span>
+                <span>المبيعات</span>
+                <span class="sr-only">الإجراءات</span>
+            </div>
+
+            @foreach ($plans as $plan)
+                <article class="access-plan-row" x-data="{ editing: false }">
+                    <div class="min-w-0">
+                        <h3 class="font-bold truncate">{{ $plan->title }}</h3>
+                        @if ($plan->description)<p class="nageeb-caption mt-1 line-clamp-2">{{ $plan->description }}</p>@endif
+                    </div>
+                    <div>
+                        <span class="access-plan-mobile-label">الفصول التي يحصل الطالب عليها</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            @foreach ($plan->semesters as $semester)
+                                <x-badge variant="info">{{ $semester->title }}</x-badge>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div>
+                        <span class="access-plan-mobile-label">السعر حسب منطقة الطالب</span>
+                        <div class="grid gap-1.5">
+                            @foreach ($plan->prices as $price)
+                                <span class="flex items-center justify-between gap-3 text-sm">
+                                    <span class="nageeb-text-muted">{{ $price->region->name }}</span>
+                                    <strong class="font-mono">{{ number_format($price->effectivePrice(), 0) }} ₪</strong>
+                                </span>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div>
+                        <span class="access-plan-mobile-label">مدة الوصول</span>
+                        <span class="text-sm">{{ $plan->access_duration_days ? $plan->access_duration_days.' يوم' : 'غير محدودة' }}</span>
+                    </div>
+                    <div>
+                        <span class="access-plan-mobile-label">الحالة</span>
+                        <x-badge variant="{{ $plan->status === \App\Enums\ContentStatus::Live ? 'success' : 'warning' }}">{{ $plan->status->label() }}</x-badge>
+                    </div>
+                    <div>
+                        <span class="access-plan-mobile-label">المبيعات</span>
+                        <strong class="font-mono">{{ $plan->enrollments_count }}</strong>
+                    </div>
+                    <div class="flex items-center justify-end gap-1">
+                        <x-button variant="ghost" size="sm" x-on:click="editing = !editing">تعديل</x-button>
+                        <form method="POST" action="{{ route('teacher.courses.packages.destroy', [$course, $plan]) }}" onsubmit="return confirm('حذف خطة الوصول؟')">
+                            @csrf
+                            @method('DELETE')
+                            <x-button type="submit" variant="ghost" size="sm" class="text-danger" :disabled="$plan->enrollments_count > 0">حذف</x-button>
+                        </form>
+                    </div>
+
+                    <div x-show="editing" x-transition x-cloak class="access-plan-row__edit">
+                        <form method="POST" action="{{ route('teacher.courses.packages.update', [$course, $plan]) }}" class="grid gap-6">
+                            @csrf
+                            @method('PUT')
+                            @include('teacher.packages._form', ['editingPlan' => $plan, 'formKey' => 'edit-'.$plan->id])
+                            <div class="flex justify-end gap-2">
+                                <x-button type="button" variant="ghost" x-on:click="editing = false">إلغاء</x-button>
+                                <x-button type="submit">حفظ التعديلات</x-button>
+                            </div>
+                        </form>
+                    </div>
+                </article>
+            @endforeach
+        </div>
     @endif
 
-    <div class="nageeb-card max-w-4xl mb-8">
-        <h2 class="nageeb-title-section mb-4">إضافة باقة جديدة</h2>
-        <p class="nageeb-text-muted text-sm mb-5">يمكنك إضافة أكثر من باقة لنفس المادة (مثلاً: الفصل الأول، الفصل الثاني، باقة سنوية).</p>
-        <form method="POST" action="{{ route('teacher.courses.packages.store', $course) }}" class="grid gap-4 sm:grid-cols-2">
+    <x-modal name="create-access-plan" title="إنشاء خطة وصول" description="هذه الخطة خاصة بمادة «{{ $course->title }}» وتحت تحكمك بالكامل.">
+        <form method="POST" action="{{ route('teacher.courses.packages.store', $course) }}" class="grid gap-6">
             @csrf
-            <x-form-input label="اسم الباقة" name="name" required />
-            <x-form-input label="مدة الباقة" name="duration_label" required />
-            <x-form-input label="سعر غزة" name="price_gaza" type="number" required step="0.01" min="0" />
-            <x-form-input label="سعر الضفة والخارج" name="price_west_bank_abroad" type="number" required step="0.01" min="0" />
-            <div class="sm:col-span-2">
-                <button type="submit" class="nageeb-btn nageeb-btn--primary">إضافة الباقة</button>
+            @include('teacher.packages._form', ['editingPlan' => null, 'formKey' => 'create'])
+            <div class="flex justify-end gap-2">
+                <x-button type="button" variant="ghost" x-on:click="$dispatch('close-modal', 'create-access-plan')">إلغاء</x-button>
+                <x-button type="submit">إنشاء الخطة</x-button>
             </div>
         </form>
-    </div>
-
-    <div class="nageeb-card overflow-x-auto" x-data="{ editing: null }">
-        <h2 class="nageeb-title-section mb-4">باقات هذه المادة</h2>
-        @if ($packages->isEmpty())
-            <x-empty-state title="لا توجد باقات بعد.">
-                أضف باقة من النموذج أعلاه (مثلاً: الفصل الأول أو باقة سنوية).
-            </x-empty-state>
-        @else
-            <table class="w-full text-sm text-start">
-                <thead>
-                    <tr class="border-b border-border">
-                        <th class="py-3 px-2 font-medium">الاسم</th>
-                        <th class="py-3 px-2 font-medium">سعر غزة</th>
-                        <th class="py-3 px-2 font-medium">سعر الضفة والخارج</th>
-                        <th class="py-3 px-2 font-medium">مدة الباقة</th>
-                        <th class="py-3 px-2 font-medium"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($packages as $package)
-                        <tr class="border-b border-border last:border-0 align-top">
-                            <td class="py-3 px-2" colspan="5">
-                                <div x-show="editing !== {{ $package->id }}" class="flex flex-wrap items-center gap-3 justify-between">
-                                    <div class="grid sm:grid-cols-4 gap-3 flex-1">
-                                        <span>{{ $package->name }}</span>
-                                        <span>{{ number_format($package->price_gaza, 2) }}</span>
-                                        <span>{{ number_format($package->price_west_bank_abroad, 2) }}</span>
-                                        <span>{{ $package->duration_label }}</span>
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <button type="button" class="nageeb-btn nageeb-btn--outline text-sm py-2 px-3" @click="editing = {{ $package->id }}">تعديل</button>
-                                        <form method="POST" action="{{ route('teacher.courses.packages.destroy', [$course, $package]) }}" onsubmit="return confirm('حذف هذه الباقة؟')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="nageeb-btn nageeb-btn--secondary text-sm py-2 px-3">حذف</button>
-                                        </form>
-                                    </div>
-                                </div>
-                                <form
-                                    method="POST"
-                                    action="{{ route('teacher.courses.packages.update', [$course, $package]) }}"
-                                    class="grid gap-3 sm:grid-cols-2"
-                                    x-show="editing === {{ $package->id }}"
-                                    x-cloak
-                                >
-                                    @csrf
-                                    @method('PUT')
-                                    <x-form-input :id="'pkg-name-'.$package->id" label="اسم الباقة" name="name" required :value="$package->name" />
-                                    <x-form-input :id="'pkg-duration-'.$package->id" label="مدة الباقة" name="duration_label" required :value="$package->duration_label" />
-                                    <x-form-input :id="'pkg-gaza-'.$package->id" label="سعر غزة" name="price_gaza" type="number" required step="0.01" min="0" :value="$package->price_gaza" />
-                                    <x-form-input :id="'pkg-wb-'.$package->id" label="سعر الضفة والخارج" name="price_west_bank_abroad" type="number" required step="0.01" min="0" :value="$package->price_west_bank_abroad" />
-                                    <div class="sm:col-span-2 flex gap-2">
-                                        <button type="submit" class="nageeb-btn nageeb-btn--primary text-sm">حفظ</button>
-                                        <button type="button" class="nageeb-btn nageeb-btn--outline text-sm" @click="editing = null">إلغاء</button>
-                                    </div>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        @endif
-    </div>
-</x-dashboard-layout>
+    </x-modal>
+</x-course-workspace>
 @endsection

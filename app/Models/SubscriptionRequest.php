@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
     'student_id',
     'course_id',
     'package_id',
+    'access_plan_id',
     'receipt_image_path',
     'status',
     'rejection_reason',
@@ -45,6 +46,11 @@ class SubscriptionRequest extends Model
     public function package(): BelongsTo
     {
         return $this->belongsTo(SubscriptionPackage::class, 'package_id');
+    }
+
+    public function accessPlan(): BelongsTo
+    {
+        return $this->belongsTo(AccessPlan::class);
     }
 
     public function receiptUrl(): string

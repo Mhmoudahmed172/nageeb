@@ -37,6 +37,16 @@ class DirectLinkAuthorizationTest extends TestCase
             ->assertOk();
     }
 
+    public function test_student_can_open_a_live_free_course_without_enrollment(): void
+    {
+        $student = User::factory()->student()->create();
+        $course = Course::factory()->create(['is_free' => true]);
+
+        $this->actingAs($student)
+            ->get(route('student.my-courses.show', $course))
+            ->assertOk();
+    }
+
     public function test_teacher_cannot_open_another_teachers_course_by_changing_id(): void
     {
         $teacher = User::factory()->teacher()->create();

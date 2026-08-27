@@ -14,8 +14,8 @@
         </x-form-select>
         <x-form-select label="المنطقة" name="region">
             <option value="">كل المناطق</option>
-            @foreach (\App\Enums\StudentRegion::cases() as $option)
-                <option value="{{ $option->value }}" @selected($region === $option->value)>{{ $option->label() }}</option>
+            @foreach ($regions as $option)
+                <option value="{{ $option->id }}" @selected((string) $region === (string) $option->id || $region === $option->code)>{{ $option->name }}</option>
             @endforeach
         </x-form-select>
         <div class="flex items-end">
@@ -41,7 +41,7 @@
                     @foreach ($enrollments as $enrollment)
                         <tr class="border-b border-border last:border-0">
                             <td class="py-3 px-2">{{ $enrollment->student->name }}</td>
-                            <td class="py-3 px-2">{{ $enrollment->student->studentProfile?->region?->label() ?? '—' }}</td>
+                            <td class="py-3 px-2">{{ $enrollment->student->studentProfile?->region?->name ?? '—' }}</td>
                             <td class="py-3 px-2">{{ $enrollment->course->title }}</td>
                             <td class="py-3 px-2">{{ $enrollment->granted_at?->format('Y/m/d') }}</td>
                             <td class="py-3 px-2">{{ $enrollment->expires_at?->format('Y/m/d') ?? 'غير محدد' }}</td>

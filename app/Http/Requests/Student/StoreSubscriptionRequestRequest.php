@@ -22,10 +22,10 @@ class StoreSubscriptionRequestRequest extends FormRequest
         $course = $this->route('course');
 
         return [
-            'package_id' => [
+            'access_plan_id' => [
                 'required',
                 'integer',
-                Rule::exists('subscription_packages', 'id')->where('course_id', $course->id),
+                Rule::exists('access_plans', 'id')->where('course_id', $course->id),
             ],
             'receipt' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ];
@@ -37,8 +37,8 @@ class StoreSubscriptionRequestRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'package_id.required' => 'يرجى اختيار باقة.',
-            'package_id.exists' => 'الباقة المختارة غير صالحة لهذه المادة.',
+            'access_plan_id.required' => 'يرجى اختيار خطة الوصول.',
+            'access_plan_id.exists' => 'الخطة المختارة غير صالحة لهذه المادة.',
             'receipt.required' => 'صورة إيصال الدفع مطلوبة.',
             'receipt.mimes' => 'يجب أن يكون الإيصال بصيغة jpg أو png أو pdf.',
             'receipt.max' => 'حجم ملف الإيصال يجب ألا يتجاوز 5 ميغابايت.',

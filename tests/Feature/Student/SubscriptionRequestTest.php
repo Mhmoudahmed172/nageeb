@@ -2,10 +2,11 @@
 
 namespace Tests\Feature\Student;
 
-use App\Enums\StudentRegion;
+use App\Enums\ContentStatus;
 use App\Enums\SubscriptionRequestStatus;
+use App\Models\AccessPlan;
+use App\Models\AccessPlanPrice;
 use App\Models\Course;
-use App\Models\SubscriptionPackage;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -25,15 +26,25 @@ class SubscriptionRequestTest extends TestCase
             'teacher_id' => $teacher->id,
             'title' => 'رياضيات',
         ]);
-        $package = SubscriptionPackage::factory()->create([
+        $plan = AccessPlan::factory()->create([
             'course_id' => $course->id,
-            'name' => 'الفصل الأول',
-            'price_gaza' => 50,
-            'price_west_bank_abroad' => 80,
+            'title' => 'الفصل الأول',
+            'status' => ContentStatus::Live,
+        ]);
+        $plan->semesters()->attach($course->defaultSemester()->id);
+        AccessPlanPrice::factory()->create([
+            'access_plan_id' => $plan->id,
+            'region_id' => $this->regionId('gaza'),
+            'price' => 50,
+        ]);
+        AccessPlanPrice::factory()->create([
+            'access_plan_id' => $plan->id,
+            'region_id' => $this->regionId('west_bank'),
+            'price' => 80,
         ]);
 
         $student = User::factory()->student()->create();
-        $student->studentProfile()->create(['region' => StudentRegion::Gaza]);
+        $student->studentProfile()->create(['region_id' => $this->regionId('gaza')]);
 
         $this->actingAs($student)
             ->get(route('courses.subscribe', $course))
@@ -45,7 +56,7 @@ class SubscriptionRequestTest extends TestCase
 
         $this->actingAs($student)
             ->post(route('courses.subscribe.store', $course), [
-                'package_id' => $package->id,
+                'access_plan_id' => $plan->id,
                 'receipt' => UploadedFile::fake()->image('receipt.jpg'),
             ])
             ->assertRedirect(route('courses.subscribe.confirmation', $course));
@@ -53,9 +64,11 @@ class SubscriptionRequestTest extends TestCase
         $this->assertDatabaseHas('subscription_requests', [
             'student_id' => $student->id,
             'course_id' => $course->id,
-            'package_id' => $package->id,
+            'access_plan_id' => $plan->id,
+            'package_id' => null,
             'status' => SubscriptionRequestStatus::Pending->value,
         ]);
+        $this->assertDatabaseCount('subscription_packages', 0);
     }
 
     public function test_guest_cannot_open_subscribe_page(): void

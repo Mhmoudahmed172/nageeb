@@ -11,34 +11,39 @@
 
     $menu = match ($user->role) {
         \App\Enums\UserRole::Teacher => [
-            ['key' => 'dashboard', 'label' => 'لوحة الأداء', 'route' => 'teacher.dashboard'],
+            ['key' => 'dashboard', 'label' => 'الرئيسية', 'route' => 'teacher.dashboard', 'icon' => 'home'],
             [
-                'label' => 'إدارة المحتوى',
+                'label' => 'التعليم',
                 'children' => [
-                    ['key' => 'courses', 'label' => 'مقرراتي', 'route' => 'teacher.courses.index'],
+                    ['key' => 'courses', 'label' => 'المواد', 'route' => 'teacher.courses.index', 'icon' => 'book'],
+                    ['key' => 'content', 'label' => 'الوحدات والدروس', 'route' => 'teacher.courses.index', 'icon' => 'layers'],
+                    ['key' => 'quizzes', 'label' => 'الاختبارات', 'route' => null, 'icon' => 'quiz'],
+                    ['key' => 'assignments', 'label' => 'الواجبات', 'route' => null, 'icon' => 'assignment'],
+                    ['key' => 'live', 'label' => 'البث المباشر', 'route' => null, 'icon' => 'live'],
                 ],
             ],
             [
-                'label' => 'تفاعل الطلاب',
+                'label' => 'الطلاب',
                 'children' => [
-                    ['key' => 'packages', 'label' => 'باقات الاشتراك', 'route' => 'teacher.packages.index'],
-                    ['key' => 'subscription-requests', 'label' => 'طلبات الاشتراك', 'route' => 'teacher.subscription-requests.index'],
-                    ['key' => 'enrollments', 'label' => 'الملتحقون', 'route' => 'teacher.enrollments.index'],
-                    ['key' => 'engagement', 'label' => 'التفاعل', 'route' => 'teacher.interactions.index'],
+                    ['key' => 'enrollments', 'label' => 'الطلاب', 'route' => 'teacher.enrollments.index', 'icon' => 'users'],
+                    ['key' => 'engagement', 'label' => 'الأسئلة', 'route' => 'teacher.interactions.index', 'icon' => 'quiz'],
+                    ['key' => 'messages', 'label' => 'الرسائل', 'route' => null, 'icon' => 'message'],
                 ],
             ],
             [
-                'label' => 'الأرباح والمستحقات',
+                'label' => 'المبيعات',
                 'children' => [
-                    ['key' => 'earnings', 'label' => 'الأرباح', 'route' => 'teacher.earnings.index'],
-                    ['key' => 'payouts', 'label' => 'التسويات والسحوبات', 'route' => 'teacher.payouts.index'],
+                    ['key' => 'packages', 'label' => 'الاشتراكات', 'route' => 'teacher.packages.index', 'icon' => 'subscription'],
+                    ['key' => 'subscription-requests', 'label' => 'الطلبات', 'route' => 'teacher.subscription-requests.index', 'icon' => 'orders'],
+                    ['key' => 'earnings', 'label' => 'الأرباح', 'route' => 'teacher.earnings.index', 'icon' => 'revenue'],
                 ],
             ],
+            ['key' => 'analytics', 'label' => 'التحليلات', 'route' => 'teacher.dashboard', 'icon' => 'analytics'],
             [
-                'label' => 'إعدادات الحساب',
+                'label' => 'الإعدادات',
                 'children' => [
-                    ['key' => 'profile', 'label' => 'ملف المدرّس', 'route' => 'teacher.profile.edit'],
-                    ['key' => 'settings', 'label' => 'إعدادات الحساب', 'route' => 'teacher.settings.edit'],
+                    ['key' => 'profile', 'label' => 'الملف العام', 'route' => 'teacher.profile.edit', 'icon' => 'users'],
+                    ['key' => 'settings', 'label' => 'إعدادات الحساب', 'route' => 'teacher.settings.edit', 'icon' => 'settings'],
                 ],
             ],
         ],
@@ -55,7 +60,7 @@
     };
 @endphp
 
-<div class="min-h-screen lg:flex">
+<div class="min-h-screen lg:flex" x-data="{ sidebarCollapsed: localStorage.getItem('nageeb-sidebar') === 'collapsed' }">
     <input
         type="checkbox"
         id="dashboard-sidebar-toggle"
@@ -65,23 +70,25 @@
 
     <label
         for="dashboard-sidebar-toggle"
-        class="fixed inset-0 z-40 bg-text opacity-40 hidden max-lg:peer-checked:block"
+        class="fixed inset-0 z-40 bg-text/45 backdrop-blur-sm hidden max-lg:peer-checked:block"
         aria-hidden="true"
     ></label>
 
     <aside
-        class="fixed top-0 start-0 z-50 flex h-dvh w-[min(18rem,90vw)] shrink-0 translate-x-full flex-col overflow-y-auto bg-surface border-e border-border transition-transform max-lg:peer-checked:translate-x-0 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:translate-x-0"
+        class="fixed top-0 start-0 z-50 flex h-dvh w-[min(var(--nageeb-sidebar-width),90vw)] shrink-0 translate-x-full flex-col overflow-y-auto bg-surface border-e border-border shadow-lg transition-[width,transform] duration-200 max-lg:peer-checked:translate-x-0 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:translate-x-0 lg:shadow-none"
+        :class="sidebarCollapsed ? 'lg:w-[5.25rem]' : 'lg:w-[var(--nageeb-sidebar-width)]'"
     >
-        <div class="bg-primary text-text-inverse px-5 py-5 flex items-start justify-between gap-3">
+        <div class="px-5 py-5 flex items-start justify-between gap-3 border-b border-border">
             <div>
-                <a href="{{ url('/') }}" class="text-text-inverse hover:text-text-inverse hover:opacity-90">
-                    <span class="text-xl font-bold">نجيب</span>
+                <a href="{{ url('/') }}" class="flex items-center gap-2 text-text hover:text-primary">
+                    <span class="grid size-9 place-items-center rounded-md bg-primary text-text-inverse font-bold">ن</span>
+                    <span class="text-xl font-bold" x-show="!sidebarCollapsed">نجيب</span>
                 </a>
-                <p class="text-sm opacity-80 mt-0.5">لوحة تحكم {{ $roleLabel }}</p>
+                <p class="text-xs nageeb-text-muted mt-1" x-show="!sidebarCollapsed">مساحة {{ $roleLabel }}</p>
             </div>
             <label
                 for="dashboard-sidebar-toggle"
-                class="nageeb-btn nageeb-btn--secondary text-sm py-2 px-3 lg:hidden cursor-pointer"
+                class="nageeb-btn nageeb-btn--ghost nageeb-btn--icon lg:hidden cursor-pointer"
                 aria-label="إغلاق القائمة"
             >
                 <span aria-hidden="true">&times;</span>
@@ -93,20 +100,23 @@
                 @foreach ($menu as $item)
                     <li>
                         @if (! empty($item['children']))
-                            <p class="nageeb-text-dim text-xs font-medium px-3 mb-2">{{ $item['label'] }}</p>
+                            <p class="nageeb-text-dim text-xs font-semibold px-3 mb-2" x-show="!sidebarCollapsed">{{ $item['label'] }}</p>
                             <ul class="flex flex-col gap-1">
                                 @foreach ($item['children'] as $child)
                                     <li>
                                         <a
-                                            href="{{ $menuHref($child['route']) }}"
+                                            href="{{ $child['route'] ? $menuHref($child['route']) : '#' }}"
                                             @class([
-                                                'flex w-full items-center px-3 py-2 text-sm font-medium',
-                                                'bg-primary text-text-inverse hover:text-text-inverse' => $activeMenu === $child['key'],
-                                                'text-text hover:bg-primary-muted hover:text-primary' => $activeMenu !== $child['key'],
+                                                'flex w-full items-center px-3 py-2.5 text-sm font-medium rounded-md transition-colors',
+                                                'bg-primary-muted text-primary' => $activeMenu === $child['key'],
+                                                'text-text-muted hover:bg-surface-muted hover:text-text' => $activeMenu !== $child['key'] && $child['route'],
+                                                'text-text-dim opacity-55 cursor-not-allowed' => ! $child['route'],
                                             ])
                                             @if ($activeMenu === $child['key']) aria-current="page" @endif
+                                            @if (! $child['route']) aria-disabled="true" title="قريباً" @endif
                                         >
-                                            {{ $child['label'] }}
+                                            <x-nav-icon :name="$child['icon'] ?? 'default'" />
+                                            <span x-show="!sidebarCollapsed">{{ $child['label'] }}</span>
                                         </a>
                                     </li>
                                 @endforeach
@@ -115,13 +125,14 @@
                             <a
                                 href="{{ $menuHref($item['route']) }}"
                                 @class([
-                                    'flex w-full items-center px-3 py-2 text-sm font-medium',
-                                    'bg-primary text-text-inverse hover:text-text-inverse' => $activeMenu === $item['key'],
-                                    'text-text hover:bg-primary-muted hover:text-primary' => $activeMenu !== $item['key'],
+                                    'flex w-full items-center px-3 py-2.5 text-sm font-medium rounded-md transition-colors',
+                                    'bg-primary-muted text-primary' => $activeMenu === $item['key'],
+                                    'text-text-muted hover:bg-surface-muted hover:text-text' => $activeMenu !== $item['key'],
                                 ])
                                 @if ($activeMenu === $item['key']) aria-current="page" @endif
                             >
-                                {{ $item['label'] }}
+                                <x-nav-icon :name="$item['icon'] ?? 'default'" />
+                                <span x-show="!sidebarCollapsed">{{ $item['label'] }}</span>
                             </a>
                         @endif
                     </li>
@@ -129,19 +140,25 @@
             </ul>
         </nav>
 
-        <div class="mt-auto px-5 py-4 border-t border-border">
-            <p class="text-sm font-medium">{{ $user->name }}</p>
-            <span class="nageeb-badge nageeb-badge--primary mt-2">{{ $roleLabel }}</span>
+        <div class="mt-auto px-3 py-4 border-t border-border">
+            <button type="button" class="hidden lg:flex w-full items-center gap-3 px-3 py-2 rounded-md text-sm nageeb-text-muted hover:bg-surface-muted" @click="sidebarCollapsed = !sidebarCollapsed; localStorage.setItem('nageeb-sidebar', sidebarCollapsed ? 'collapsed' : 'expanded')" :aria-label="sidebarCollapsed ? 'توسيع القائمة' : 'طي القائمة'">
+                <svg class="size-5 shrink-0 transition-transform" :class="sidebarCollapsed && 'rotate-180'" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m15 18-6-6 6-6" stroke-width="1.7"/></svg>
+                <span x-show="!sidebarCollapsed">طي القائمة</span>
+            </button>
+            <div class="px-3 pt-3" x-show="!sidebarCollapsed">
+                <p class="text-sm font-medium truncate">{{ $user->name }}</p>
+                <span class="nageeb-caption">{{ $roleLabel }}</span>
+            </div>
         </div>
     </aside>
 
     <div class="flex min-h-screen min-w-0 flex-1 flex-col">
-        <header class="bg-surface border-b border-border">
-            <div class="flex items-center justify-between gap-3 px-4 py-3 sm:px-5 sm:py-4 flex-wrap">
+        <header class="sticky top-0 z-30 bg-surface/95 backdrop-blur border-b border-border">
+            <div class="flex min-h-[var(--nageeb-topbar-height)] items-center justify-between gap-3 px-4 sm:px-6">
                 <div class="flex items-center gap-3 min-w-0">
                     <label
                         for="dashboard-sidebar-toggle"
-                        class="nageeb-btn nageeb-btn--outline py-2 px-3 lg:hidden cursor-pointer"
+                        class="nageeb-btn nageeb-btn--ghost nageeb-btn--icon lg:hidden cursor-pointer"
                         aria-label="فتح القائمة"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5" aria-hidden="true">
@@ -154,7 +171,7 @@
                     <div class="relative" x-data="{ open: false }" dir="rtl">
                         <button
                             type="button"
-                            class="relative nageeb-btn nageeb-btn--outline py-2 px-3"
+                            class="relative nageeb-btn nageeb-btn--ghost nageeb-btn--icon"
                             @click="open = !open"
                             aria-label="الإشعارات"
                             :aria-expanded="open"
@@ -193,10 +210,10 @@
                             @endforelse
                         </div>
                     </div>
-                    <span class="text-sm nageeb-text-muted hidden sm:inline">{{ $user->name }}</span>
+                    <span class="text-sm font-medium hidden sm:inline">{{ $user->name }}</span>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="nageeb-btn nageeb-btn--secondary text-sm py-2 px-3 sm:px-4">
+                        <button type="submit" class="nageeb-btn nageeb-btn--ghost text-sm">
                             خروج
                         </button>
                     </form>
@@ -204,8 +221,25 @@
             </div>
         </header>
 
-        <main class="nageeb-container py-6 sm:py-10 flex-1 w-full min-w-0">
+        <main @class(['nageeb-container py-6 sm:py-8 flex-1 w-full min-w-0', 'max-lg:pb-24' => $user->isTeacher()])>
             {{ $slot }}
         </main>
     </div>
+
+    @if ($user->isTeacher())
+        <nav class="lg:hidden fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-border bg-surface/95 backdrop-blur px-2 pb-[env(safe-area-inset-bottom)]" aria-label="التنقل السريع">
+            @foreach ([
+                ['dashboard', 'الرئيسية', 'teacher.dashboard', 'home'],
+                ['courses', 'المواد', 'teacher.courses.index', 'book'],
+                ['enrollments', 'الطلاب', 'teacher.enrollments.index', 'users'],
+                ['earnings', 'الأرباح', 'teacher.earnings.index', 'revenue'],
+                ['settings', 'الإعدادات', 'teacher.settings.edit', 'settings'],
+            ] as [$key, $label, $routeName, $icon])
+                <a href="{{ route($routeName) }}" @class(['flex min-h-16 flex-col items-center justify-center gap-1 text-[0.65rem]', 'text-primary' => $activeMenu === $key, 'text-text-muted' => $activeMenu !== $key])>
+                    <x-nav-icon :name="$icon" />
+                    <span>{{ $label }}</span>
+                </a>
+            @endforeach
+        </nav>
+    @endif
 </div>

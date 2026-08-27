@@ -7,29 +7,33 @@ use App\Http\Requests\Teacher\StoreCommentReplyRequest;
 use App\Models\Comment;
 use App\Notifications\CommentRepliedNotification;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class InteractionController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
         $questions = Comment::query()
-            ->with(['user', 'lesson.unit.course', 'replies.user'])
+            ->with(['user', 'lesson.unit.semester.course', 'replies.user'])
             ->whereNull('parent_id')
             ->whereHas(
-                'lesson.unit.course',
+                'lesson.unit.semester.course',
                 fn ($query) => $query->where('teacher_id', auth()->id()),
             )
             ->latest()
             ->get();
 
-        return view('teacher.interactions.index', compact('questions'));
+        return view('teacher.interactions.index', [
+            'questions' => $questions,
+            'focusQuestionId' => $request->integer('question') ?: null,
+        ]);
     }
 
     public function reply(StoreCommentReplyRequest $request, Comment $comment): RedirectResponse
     {
         abort_unless($comment->parent_id === null, 422);
-        abort_unless($comment->lesson->unit->course->teacher_id === auth()->id(), 403);
+        abort_unless($comment->lesson->unit->semester->course->teacher_id === auth()->id(), 403);
 
         $reply = Comment::query()->create([
             'lesson_id' => $comment->lesson_id,

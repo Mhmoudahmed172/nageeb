@@ -7,12 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 
-#[Fillable(['lesson_id', 'name', 'path'])]
-class LessonAttachment extends Model
+#[Fillable(['course_id', 'name', 'path', 'position'])]
+class CourseAttachment extends Model
 {
-    public function lesson(): BelongsTo
+    public function course(): BelongsTo
     {
-        return $this->belongsTo(Lesson::class);
+        return $this->belongsTo(Course::class);
     }
 
     public function url(): string

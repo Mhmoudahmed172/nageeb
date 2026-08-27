@@ -13,11 +13,11 @@
 
         <x-form-input label="رقم الجوال" name="phone" type="tel" required />
 
-        <x-form-select label="المنطقة" name="region" required>
-            <option value="" disabled @selected(old('region') === null)>اختر المنطقة</option>
-            @foreach (\App\Enums\StudentRegion::cases() as $region)
-                <option value="{{ $region->value }}" @selected(old('region') === $region->value)>
-                    {{ $region->label() }}
+        <x-form-select label="المنطقة" name="region_id" required>
+            <option value="" disabled @selected(old('region_id') === null)>اختر المنطقة</option>
+            @foreach ($regions as $region)
+                <option value="{{ $region->id }}" @selected((string) old('region_id') === (string) $region->id)>
+                    {{ $region->name }}
                 </option>
             @endforeach
         </x-form-select>

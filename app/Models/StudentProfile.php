@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\StudentRegion;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -16,19 +15,23 @@ class StudentProfile extends Model
 
     protected $fillable = [
         'user_id',
-        'region',
+        'region_id',
         'grade_level',
+        'last_viewed_lesson_id',
     ];
-
-    protected function casts(): array
-    {
-        return [
-            'region' => StudentRegion::class,
-        ];
-    }
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function region(): BelongsTo
+    {
+        return $this->belongsTo(Region::class);
+    }
+
+    public function lastViewedLesson(): BelongsTo
+    {
+        return $this->belongsTo(Lesson::class, 'last_viewed_lesson_id');
     }
 }
