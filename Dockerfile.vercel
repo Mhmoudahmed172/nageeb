@@ -6,14 +6,17 @@ FROM node:22-alpine AS frontend
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-
 RUN npm ci
 
-COPY . .
+COPY resources ./resources
+COPY vite.config.js ./
+COPY public ./public
 
-RUN npm run build
-
-RUN test -f /app/public/build/manifest.json
+RUN npm run build \
+    && if [ -f /app/public/build/.vite/manifest.json ] && [ ! -f /app/public/build/manifest.json ]; then \
+        cp /app/public/build/.vite/manifest.json /app/public/build/manifest.json; \
+    fi \
+    && test -f /app/public/build/manifest.json
 
 
 # ============================================================
@@ -42,14 +45,19 @@ RUN install-php-extensions pdo_pgsql pgsql
 
 WORKDIR /app
 
-COPY --from=deps /app/vendor ./vendor
-
-COPY . .
-
-COPY --from=frontend /app/public/build ./public/build
-
+COPY --from=deps /app/vendor /app/vendor
+COPY . /app
+COPY --from=frontend /app/public/build /opt/vite-build
+COPY docker/frankenphp-start.sh /usr/local/bin/frankenphp-start.sh
 COPY Caddyfile /etc/caddy/Caddyfile
+
+RUN chmod +x /usr/local/bin/frankenphp-start.sh \
+    && rm -rf /app/public/build \
+    && mkdir -p /app/public/build \
+    && cp -a /opt/vite-build/. /app/public/build/ \
+    && test -f /app/public/build/manifest.json \
+    && test -d /app/public/build/assets
 
 ENV PORT=80
 
-CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]
+CMD ["/usr/local/bin/frankenphp-start.sh"]
