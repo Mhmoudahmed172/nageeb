@@ -5,20 +5,14 @@ FROM node:22-alpine AS frontend
 
 WORKDIR /app
 
-# Install JavaScript dependencies first for better Docker caching
 COPY package.json package-lock.json ./
 
 RUN npm ci
 
-# Copy files required by Vite
-COPY resources ./resources
-COPY public ./public
-COPY vite.config.js ./
+COPY . .
 
-# Build production assets
 RUN npm run build
 
-# Verify that Laravel Vite manifest was generated
 RUN test -f /app/public/build/manifest.json
 
 
@@ -44,25 +38,18 @@ RUN composer install \
 # ============================================================
 FROM dunglas/frankenphp:1-php8.4-alpine
 
-# Install PostgreSQL PHP extensions
 RUN install-php-extensions pdo_pgsql pgsql
 
 WORKDIR /app
 
-# Copy Composer dependencies
 COPY --from=deps /app/vendor ./vendor
 
-# Copy Laravel application
 COPY . .
 
-# Copy Vite production assets from frontend build stage
 COPY --from=frontend /app/public/build ./public/build
 
-# Copy Caddy configuration
 COPY Caddyfile /etc/caddy/Caddyfile
 
-# Vercel provides PORT
 ENV PORT=80
 
-# Start FrankenPHP
 CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]
