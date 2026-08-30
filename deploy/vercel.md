@@ -19,7 +19,7 @@ APP_NAME=نجيب
 APP_ENV=production
 APP_DEBUG=false
 APP_KEY=base64:...
-APP_URL=https://your-vercel-domain
+APP_URL=https://nageeb-five.vercel.app
 APP_LOCALE=ar
 APP_FALLBACK_LOCALE=ar
 

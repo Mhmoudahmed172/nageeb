@@ -32,5 +32,12 @@ class AppServiceProvider extends ServiceProvider
         if (str_starts_with((string) config('app.url'), 'https://')) {
             URL::forceHttps();
         }
+
+        if (! $this->app->runningInConsole()) {
+            $request = request();
+            if ($request->isSecure() || $request->header('X-Forwarded-Proto') === 'https') {
+                URL::forceHttps();
+            }
+        }
     }
 }
