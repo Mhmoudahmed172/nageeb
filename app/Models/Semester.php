@@ -39,6 +39,11 @@ class Semester extends Model
         return $this->belongsToMany(AccessPlan::class, 'access_plan_semester')->withTimestamps();
     }
 
+    public function exams(): HasMany
+    {
+        return $this->hasMany(Exam::class);
+    }
+
     public function nextUnitPosition(): int
     {
         return (int) $this->units()->max('position') + 1;

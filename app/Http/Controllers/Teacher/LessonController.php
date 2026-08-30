@@ -282,16 +282,7 @@ class LessonController extends Controller
                 continue;
             }
 
-            $created->push($lesson->contents()->create([
-                'type' => LessonContentType::File,
-                'title' => $file->getClientOriginalName(),
-                'position' => $position,
-                'status' => ContentStatus::Live,
-                'data' => [
-                    'name' => $file->getClientOriginalName(),
-                    'path' => $file->store('lessons/files', 'public'),
-                ],
-            ]));
+            $created->push(VideoAsset::storeFile($lesson, $file, $position, LessonContentType::File));
             $position++;
         }
 

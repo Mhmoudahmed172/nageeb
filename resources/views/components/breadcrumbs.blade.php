@@ -1,6 +1,6 @@
 @props(['items' => []])
 
-<nav aria-label="مسار التنقل">
+<nav aria-label="مسار التنقل" {{ $attributes }}>
     <ol class="nageeb-breadcrumbs">
         @foreach ($items as $item)
             <li>

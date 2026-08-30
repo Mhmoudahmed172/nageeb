@@ -5,59 +5,67 @@ namespace App\Http\Controllers\Teacher;
 use App\Enums\ContentStatus;
 use App\Enums\LessonContentType;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Teacher\StoreLessonContentRequest;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\LessonContent;
+use App\Support\ExternalUrl;
+use App\Support\MediaStore;
 use App\Support\VideoAsset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class LessonContentController extends Controller
 {
-    public function store(Request $request, Course $course, Lesson $lesson): RedirectResponse
+    public function __construct(private readonly MediaStore $media) {}
+
+    public function store(StoreLessonContentRequest $request, Course $course, Lesson $lesson): JsonResponse|RedirectResponse
     {
         $this->authorizeLesson($course, $lesson);
 
-        $type = LessonContentType::tryFrom((string) $request->input('type'));
-        abort_if($type === null, 422);
-
-        $request->validate([
-            'type' => ['required', Rule::enum(LessonContentType::class)],
-            'file' => match ($type) {
-                LessonContentType::Video => ['required', 'file', 'mimes:mp4,webm,mov,avi', 'max:102400'],
-                LessonContentType::Audio => ['required', 'file', 'mimes:mp3,wav,m4a,ogg', 'max:51200'],
-                LessonContentType::File => ['required', 'file', 'mimes:pdf,jpg,jpeg,png,webp,zip,doc,docx', 'max:10240'],
-                default => ['prohibited'],
-            },
-        ]);
-
+        $type = $request->contentType();
         $file = $request->file('file');
         $position = $lesson->nextContentPosition();
 
-        if ($type === LessonContentType::Video && $file) {
-            VideoAsset::store($lesson, $file, $position);
-        } elseif ($file) {
-            $lesson->contents()->create([
-                'type' => $type,
-                'title' => $file->getClientOriginalName(),
-                'position' => $position,
-                'status' => ContentStatus::Draft,
-                'data' => [
-                    'name' => $file->getClientOriginalName(),
-                    'path' => $file->store($this->diskFolder($type), 'public'),
-                    'state' => VideoAsset::STATE_READY,
-                ],
-            ]);
-        } else {
-            $lesson->contents()->create([
-                'type' => $type,
-                'title' => null,
-                'position' => $position,
-                'status' => ContentStatus::Draft,
-                'data' => [],
-            ]);
+        try {
+            if ($type === LessonContentType::Video && $file) {
+                $content = VideoAsset::store($lesson, $file, $position);
+            } elseif ($request->isMediaType() && $file) {
+                $content = VideoAsset::storeFile($lesson, $file, $position, $type);
+            } else {
+                $data = [];
+
+                if ($type === LessonContentType::Link && $request->filled('url')) {
+                    $data['url'] = ExternalUrl::assert((string) $request->input('url'));
+                    $data['source'] = 'external_link';
+                }
+
+                $content = $lesson->contents()->create([
+                    'type' => $type,
+                    'title' => null,
+                    'position' => $position,
+                    'status' => ContentStatus::Draft,
+                    'data' => $data,
+                ]);
+            }
+        } catch (ValidationException $exception) {
+            if ($request->expectsJson()) {
+                throw $exception;
+            }
+
+            return back()->withErrors($exception->errors())->withInput();
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'ok' => true,
+                'id' => $content->id,
+                'type' => $type->value,
+                'message' => 'تمت إضافة «'.$type->label().'» إلى الدرس.',
+            ], 201);
         }
 
         return back()->with('status', 'تمت إضافة «'.$type->label().'» إلى الدرس.');
@@ -75,15 +83,23 @@ class LessonContentController extends Controller
             'region_ids' => ['nullable', 'array'],
             'region_ids.*' => ['integer', Rule::exists('regions', 'id')],
             'body' => ['nullable', 'string', 'max:50000'],
-            'url' => ['nullable', 'url', 'max:2048'],
+            'url' => ['nullable', 'string', 'max:2048'],
             'instructions' => ['nullable', 'string', 'max:20000'],
             'scheduled_at' => ['nullable', 'date'],
         ]);
+
+        if (filled($validated['url'] ?? null)) {
+            $validated['url'] = ExternalUrl::assert((string) $validated['url']);
+        }
 
         $payload = collect($validated)
             ->only(['body', 'url', 'instructions', 'scheduled_at'])
             ->reject(fn ($value) => $value === null)
             ->all();
+
+        if (isset($payload['url'])) {
+            $payload['source'] = 'external_link';
+        }
 
         $content->fill([
             'title' => $validated['title'] ?? null,
@@ -105,14 +121,10 @@ class LessonContentController extends Controller
         $this->authorizeLesson($course, $lesson);
         abort_unless($content->lesson_id === $lesson->id, 404);
 
+        $this->media->delete($content->data['path'] ?? null, $content->data['disk'] ?? null);
         $content->delete();
 
         return back()->with('status', 'تم حذف المحتوى.');
-    }
-
-    private function diskFolder(LessonContentType $type): string
-    {
-        return $type === LessonContentType::Audio ? 'lessons/audio' : 'lessons/files';
     }
 
     private function authorizeLesson(Course $course, Lesson $lesson): void

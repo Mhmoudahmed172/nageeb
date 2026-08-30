@@ -1,21 +1,25 @@
 @props(['title', 'subtitle' => null])
 
-<div class="min-h-screen flex flex-col">
-    <header class="bg-surface border-b border-border">
-        <div class="nageeb-container py-4 flex items-center justify-between">
-            <a href="{{ url('/') }}" class="flex items-center gap-3 text-text hover:text-primary">
-                <span class="grid size-9 place-items-center rounded-md bg-primary text-white font-bold">ن</span>
-                <span>
-                    <span class="text-xl font-bold block">نجيب</span>
-                    <span class="nageeb-caption block">منصة تعليمية احترافية</span>
-                </span>
-            </a>
+<div class="nageeb-page nageeb-auth min-h-screen">
+    <aside class="nageeb-auth__visual" aria-hidden="true">
+        <x-nageeb-img path="hero/hero-student-studying.png" alt="" eager class="nageeb-auth__photo" />
+        <div class="nageeb-auth__caption">
+            <p class="nageeb-kicker">منصة تعليمية فلسطينية</p>
+            <p class="nageeb-type-h3 mt-2 text-text-inverse">تعلّم بطريقة أوضح</p>
         </div>
-    </header>
+    </aside>
 
-    <main class="flex-1 flex items-center justify-center py-10 px-4">
+    <div class="nageeb-auth__panel">
+        <a href="{{ url('/') }}" class="nageeb-public-nav__brand mb-8 inline-flex">
+            <span class="nageeb-mark">ن</span>
+            <span>
+                <span class="text-xl font-bold block">نجيب</span>
+                <span class="nageeb-caption block">منصة تعليمية احترافية</span>
+            </span>
+        </a>
+
         <div class="w-full max-w-md">
-            <div class="text-center mb-8">
+            <div class="mb-8">
                 <h2 class="nageeb-heading-1 mb-2">{{ $title }}</h2>
                 @if ($subtitle)
                     <p class="nageeb-text-muted">{{ $subtitle }}</p>
@@ -32,5 +36,5 @@
                 </div>
             @endisset
         </div>
-    </main>
+    </div>
 </div>

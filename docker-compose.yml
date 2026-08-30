@@ -1,0 +1,51 @@
+# Local production-like stack: PostgreSQL + PHP-FPM + nginx.
+# Copy .env.example to .env, set APP_KEY, DB_* for the postgres service, then:
+#   docker compose up --build
+#   docker compose exec app php artisan migrate --force
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: nageeb
+      POSTGRES_USER: nageeb
+      POSTGRES_PASSWORD: nageeb
+    ports:
+      - "5432:5432"
+    volumes:
+      - nageeb_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nageeb -d nageeb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    env_file: .env
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: nageeb
+      DB_USERNAME: nageeb
+      DB_PASSWORD: nageeb
+    volumes:
+      - .:/var/www/html
+      - /var/www/html/vendor
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html:ro
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+
+volumes:
+  nageeb_pg:

@@ -13,34 +13,29 @@
         <a href="{{ route('teacher.courses.create') }}" class="nageeb-btn nageeb-btn--primary self-start">إضافة مادة</a>
     </div>
 
-    <div class="nageeb-card nageeb-table-wrap">
-        @if ($courses->isEmpty())
+    @if ($courses->isEmpty())
+        <x-card>
             <x-empty-state title="لا توجد مواد بعد." action-href="{{ route('teacher.courses.create') }}" action-label="إنشاء مادة" />
-        @else
-            <table class="w-full text-sm text-start">
-                <thead>
-                    <tr class="border-b border-border">
-                        <th class="py-3 px-2 font-medium">المادة</th>
-                        <th class="py-3 px-2 font-medium">الحالة</th>
-                        <th class="py-3 px-2 font-medium"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($courses as $course)
-                        <tr class="border-b border-border last:border-0">
-                            <td class="py-3 px-2">{{ $course->title }}</td>
-                            <td class="py-3 px-2">{{ $course->status->label() }}</td>
-                            <td class="py-3 px-2">
-                                <div class="flex flex-wrap gap-2">
-                                <a href="{{ route('teacher.courses.content', $course) }}" class="nageeb-btn nageeb-btn--primary text-sm py-2 px-3">إدارة</a>
-                                <a href="{{ route('teacher.courses.edit', $course) }}" class="nageeb-btn nageeb-btn--outline text-sm py-2 px-3">تعديل</a>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        @endif
-    </div>
+        </x-card>
+    @else
+        <x-reveal stagger class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            @foreach ($courses as $course)
+                <div class="nageeb-reveal-item">
+                    <x-course-card
+                        variant="teacher"
+                        :title="$course->title"
+                        :image="\App\Support\NageebVisual::courseCover($course, $loop->index)"
+                        :grade="$course->grade_level?->label()"
+                        :badge="$course->status->label()"
+                        :href="route('teacher.courses.content', $course)"
+                        cta="إدارة"
+                    />
+                    <div class="mt-2">
+                        <a href="{{ route('teacher.courses.edit', $course) }}" class="nageeb-btn nageeb-btn--outline nageeb-btn--sm">تعديل</a>
+                    </div>
+                </div>
+            @endforeach
+        </x-reveal>
+    @endif
 </x-dashboard-layout>
 @endsection

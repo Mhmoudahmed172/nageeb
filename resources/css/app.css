@@ -3,6 +3,8 @@
 @import './design-system/tokens.css';
 @import './design-system/base.css';
 @import './design-system/components.css';
+@import './design-system/patterns.css';
+@import './design-system/experience.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -18,6 +20,10 @@
     --color-primary-hover: var(--nageeb-primary-hover);
     --color-primary-light: var(--nageeb-primary-light);
     --color-primary-muted: var(--nageeb-primary-muted);
+    --color-navy: var(--nageeb-navy);
+    --color-navy-muted: var(--nageeb-navy-muted);
+    --color-brown: var(--nageeb-brown);
+    --color-chocolate: var(--nageeb-chocolate);
 
     --color-secondary: var(--nageeb-secondary);
     --color-secondary-hover: var(--nageeb-secondary-hover);
@@ -55,4 +61,11 @@
 
     --color-border: var(--nageeb-border);
     --color-border-strong: var(--nageeb-border-strong);
+
+    --color-sky: var(--nageeb-sky);
+    --color-sky-muted: var(--nageeb-sky-muted);
+    --color-cyan: var(--nageeb-cyan);
+    --color-cyan-muted: var(--nageeb-cyan-muted);
+    --color-violet: var(--nageeb-violet);
+    --color-violet-muted: var(--nageeb-violet-muted);
 }

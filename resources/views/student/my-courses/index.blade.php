@@ -5,18 +5,26 @@
 @section('content')
 <x-dashboard-layout title="موادي" role-label="الطالب" active-menu="courses">
     @if ($courses->isEmpty())
-        <div class="nageeb-card max-w-xl">
+        <x-card class="max-w-xl">
             <x-empty-state title="لا يوجد لديك مواد بعد" action-href="{{ url('/courses') }}" action-label="تصفح المواد المتاحة" />
-        </div>
+        </x-card>
     @else
-        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <x-reveal stagger class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             @foreach ($courses as $course)
-                <a href="{{ route('student.my-courses.show', $course) }}" class="nageeb-card hover:shadow-md block">
-                    <h2 class="font-semibold mb-2">{{ $course->title }}</h2>
-                    <p class="nageeb-text-muted text-sm">{{ $course->teacher->name }}</p>
-                </a>
+                <div class="nageeb-reveal-item">
+                    <x-course-card
+                        variant="student"
+                        :title="$course->title"
+                        :teacher="$course->teacher->name"
+                        :image="\App\Support\NageebVisual::courseCover($course, $loop->index)"
+                        :avatar="\App\Support\NageebVisual::teacherPhoto($course->teacher)"
+                        :grade="$course->grade_level?->label()"
+                        :href="route('student.my-courses.show', $course)"
+                        cta="متابعة التعلّم"
+                    />
+                </div>
             @endforeach
-        </div>
+        </x-reveal>
     @endif
 </x-dashboard-layout>
 @endsection

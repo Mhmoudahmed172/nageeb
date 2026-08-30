@@ -61,9 +61,49 @@ Alpine.data('curriculumWorkspace', () => ({
 }));
 
 const MEDIA_TYPES = {
-    video: 'video/mp4,video/webm,video/quicktime,video/x-msvideo',
+    video: 'video/mp4,video/webm,video/quicktime,video/x-msvideo,video/x-m4v',
     audio: 'audio/mpeg,audio/wav,audio/mp4,audio/ogg',
-    file: '.pdf,.jpg,.jpeg,.png,.webp,.zip,.doc,.docx',
+    file: '.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.webp,.zip',
+};
+
+const uploadErrorMessage = (request) => {
+    if (request.status === 413) {
+        return 'حجم الملف أكبر من الحد المسموح.';
+    }
+
+    if (request.status === 419) {
+        return 'انتهت جلسة الرفع. حدّث الصفحة وحاول مرة أخرى.';
+    }
+
+    if (request.status === 403) {
+        return 'ليس لديك صلاحية رفع هذا الملف.';
+    }
+
+    if (request.status === 401) {
+        return 'انتهت جلسة الرفع. سجّل الدخول ثم حاول مرة أخرى.';
+    }
+
+    try {
+        const payload = JSON.parse(request.responseText || '{}');
+
+        if (payload.message) {
+            return payload.message;
+        }
+
+        const first = payload.errors && Object.values(payload.errors).flat()[0];
+
+        if (first) {
+            return first;
+        }
+    } catch (error) {
+        // Fall through to the status-based message.
+    }
+
+    if (request.status === 422) {
+        return 'البيانات المرفوعة غير صالحة.';
+    }
+
+    return 'فشل الرفع، حاول مرة أخرى.';
 };
 
 Alpine.data('lessonBuilder', () => ({
@@ -71,6 +111,7 @@ Alpine.data('lessonBuilder', () => ({
     title: '',
     upload: null,
     submitting: false,
+    errorMessage: '',
     timers: {},
 
     init() {
@@ -100,7 +141,7 @@ Alpine.data('lessonBuilder', () => ({
             saving: 'جارٍ الحفظ…',
             saved: 'تم الحفظ',
             dirty: 'تغييرات غير محفوظة',
-            error: 'تعذّر الحفظ',
+            error: this.errorMessage || 'تعذّر الحفظ',
         }[this.state] ?? '';
     },
 
@@ -112,7 +153,7 @@ Alpine.data('lessonBuilder', () => ({
         return {
             uploading: `جارٍ الرفع ${this.upload.percent}%`,
             processing: 'جارٍ المعالجة…',
-            error: 'فشل الرفع، حاول مرة أخرى.',
+            error: this.upload.message || 'فشل الرفع، حاول مرة أخرى.',
         }[this.upload.state];
     },
 
@@ -141,16 +182,18 @@ Alpine.data('lessonBuilder', () => ({
         }
 
         const body = new FormData();
+        body.append('_token', this.csrf);
         body.append('type', this.$refs.type.value);
         body.append('file', file);
 
-        this.upload = { name: file.name, percent: 0, state: 'uploading' };
+        this.upload = { name: file.name, percent: 0, state: 'uploading', message: '' };
         this.$refs.file.value = '';
 
         const request = new XMLHttpRequest();
         request.open('POST', this.$refs.addForm.action);
         request.setRequestHeader('X-CSRF-TOKEN', this.csrf);
         request.setRequestHeader('Accept', 'application/json');
+        request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
         request.upload.addEventListener('progress', (event) => {
             if (event.lengthComputable) {
@@ -160,18 +203,22 @@ Alpine.data('lessonBuilder', () => ({
 
         request.addEventListener('load', () => {
             if (request.status >= 400) {
-                this.upload = { ...this.upload, state: 'error' };
+                this.upload = {
+                    ...this.upload,
+                    state: 'error',
+                    message: uploadErrorMessage(request),
+                };
 
                 return;
             }
 
-            this.upload = { ...this.upload, state: 'processing' };
+            this.upload = { ...this.upload, state: 'processing', percent: 100 };
             this.submitting = true;
             window.location.reload();
         });
 
         request.addEventListener('error', () => {
-            this.upload = { ...this.upload, state: 'error' };
+            this.upload = { ...this.upload, state: 'error', message: 'تعذّر الاتصال بالخادم أثناء الرفع.' };
         });
 
         request.send(body);
@@ -218,13 +265,105 @@ Alpine.data('lessonBuilder', () => ({
             });
 
             if (!response.ok) {
-                throw new Error('Could not save the content block.');
+                let message = 'تعذّر الحفظ';
+
+                try {
+                    const payload = await response.json();
+                    message = payload.message
+                        || (payload.errors && Object.values(payload.errors).flat()[0])
+                        || message;
+                } catch (parseError) {
+                    // Keep the fallback label.
+                }
+
+                this.state = 'error';
+                this.errorMessage = message;
+                throw new Error(message);
             }
 
             this.state = 'saved';
         } catch (error) {
             this.state = 'error';
         }
+    },
+}));
+
+document.documentElement.classList.add('js-ready');
+
+const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+Alpine.data('siteNav', () => ({
+    scrolled: false,
+    open: false,
+    init() {
+        const onScroll = () => {
+            this.scrolled = window.scrollY > 10;
+        };
+
+        onScroll();
+        window.addEventListener('scroll', onScroll, { passive: true });
+    },
+}));
+
+Alpine.data('reveal', (delay = 0) => ({
+    visible: false,
+    init() {
+        if (prefersReducedMotion()) {
+            this.visible = true;
+            return;
+        }
+
+        this.$el.style.transitionDelay = `${delay}ms`;
+
+        const observer = new IntersectionObserver(([entry]) => {
+            if (! entry.isIntersecting) {
+                return;
+            }
+
+            this.visible = true;
+            observer.disconnect();
+        }, { threshold: 0.14, rootMargin: '0px 0px -6% 0px' });
+
+        observer.observe(this.$el);
+    },
+}));
+
+Alpine.data('countUp', (target) => ({
+    display: String(target),
+    init() {
+        const raw = String(target);
+        const prefix = (raw.match(/^[^\d]+/) || [''])[0];
+        const remainder = raw.slice(prefix.length);
+        const end = Number(remainder.replace(/[^\d.-]/g, '')) || 0;
+        const suffix = remainder.replace(/^[\d.,\s-]+/, '');
+
+        if (prefersReducedMotion() || end <= 0) {
+            this.display = raw;
+            return;
+        }
+
+        const observer = new IntersectionObserver(([entry]) => {
+            if (! entry.isIntersecting) {
+                return;
+            }
+
+            const started = performance.now();
+            const duration = 900;
+            const step = (now) => {
+                const progress = Math.min((now - started) / duration, 1);
+                const eased = 1 - (1 - progress) ** 3;
+                this.display = `${prefix}${Math.round(end * eased).toLocaleString('en-US')}${suffix}`;
+
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                }
+            };
+
+            requestAnimationFrame(step);
+            observer.disconnect();
+        }, { threshold: 0.4 });
+
+        observer.observe(this.$el);
     },
 }));
 

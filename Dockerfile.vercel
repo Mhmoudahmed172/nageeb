@@ -1,0 +1,56 @@
+# Single HTTP container for Vercel container deployments.
+# Listens on $PORT (default 80). Do not use docker-compose on Vercel.
+
+FROM node:22-alpine AS assets
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts
+COPY resources ./resources
+COPY vite.config.js ./
+COPY public ./public
+RUN npm run build
+
+FROM composer:2 AS vendor
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-scripts --no-interaction --prefer-dist --optimize-autoloader
+
+FROM php:8.3-fpm-alpine
+WORKDIR /var/www/html
+
+RUN apk add --no-cache \
+        nginx \
+        icu-dev \
+        libpq-dev \
+        libzip-dev \
+        oniguruma-dev \
+        linux-headers \
+    && docker-php-ext-install \
+        intl \
+        pdo_pgsql \
+        pgsql \
+        pcntl \
+        bcmath \
+        zip \
+        opcache
+
+COPY docker/php.ini /usr/local/etc/php/conf.d/nageeb.ini
+COPY docker/nginx.vercel.conf /etc/nginx/nginx-laravel.conf.template
+COPY docker/vercel-start.sh /usr/local/bin/vercel-start.sh
+RUN chmod +x /usr/local/bin/vercel-start.sh \
+    && rm -f /etc/nginx/http.d/default.conf \
+    && printf '[www]\nlisten = 127.0.0.1:9000\n' > /usr/local/etc/php-fpm.d/zz-vercel.conf
+
+COPY --from=vendor /app/vendor ./vendor
+COPY . .
+COPY --from=assets /app/public/build ./public/build
+
+RUN mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && php artisan package:discover --ansi || true
+
+ENV TRUSTED_PROXIES=*
+ENV PORT=80
+
+EXPOSE 80
+CMD ["/usr/local/bin/vercel-start.sh"]

@@ -63,6 +63,21 @@ class User extends Authenticatable
         return $this->hasMany(PayoutRequest::class, 'teacher_id');
     }
 
+    public function exams(): HasMany
+    {
+        return $this->hasMany(Exam::class, 'teacher_id');
+    }
+
+    public function questions(): HasMany
+    {
+        return $this->hasMany(Question::class, 'teacher_id');
+    }
+
+    public function examAttempts(): HasMany
+    {
+        return $this->hasMany(ExamAttempt::class, 'student_id');
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === UserRole::Admin;

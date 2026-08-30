@@ -9,14 +9,31 @@
     @endif
 
     @if ($currentLesson)
-        <div class="nageeb-card mb-8">
-            <h2 class="font-semibold mb-4">{{ $currentLesson->title }}</h2>
+        <div class="nageeb-learn mb-8">
+            <div>
+        <div class="nageeb-lesson-player mb-6">
+            <div class="nageeb-lesson-player__body !pb-0">
+                <h2 class="nageeb-type-h3 mb-4">{{ $currentLesson->title }}</h2>
+            </div>
             @if ($currentLesson->videoUrl())
-                <video class="w-full bg-text" controls src="{{ $currentLesson->videoUrl() }}"></video>
+                <div class="nageeb-lesson-player__stage">
+                    <video class="w-full h-full object-contain bg-text" controls src="{{ $currentLesson->videoUrl() }}"></video>
+                </div>
             @elseif ($currentLesson->embedUrl())
                 <iframe class="w-full aspect-video" src="{{ $currentLesson->embedUrl() }}" allowfullscreen title="{{ $currentLesson->title }}"></iframe>
-            @else
-                <p class="nageeb-text-muted">لا يوجد مصدر فيديو لهذا الدرس بعد.</p>
+            @endif
+
+            <div class="nageeb-lesson-player__body">
+            @if ($currentLesson->contents->isNotEmpty())
+                <div class="grid gap-3">
+                    @foreach ($currentLesson->contents as $block)
+                        @if ($block->type === \App\Enums\LessonContentType::File)
+                            <a href="{{ $block->accessUrl() }}" class="nageeb-btn nageeb-btn--outline nageeb-btn--sm">{{ $block->displayName() }}</a>
+                        @elseif ($block->type === \App\Enums\LessonContentType::Link && ! empty($block->data['url']))
+                            <a href="{{ $block->data['url'] }}" target="_blank" rel="noopener noreferrer" class="nageeb-btn nageeb-btn--outline nageeb-btn--sm">{{ $block->displayName() }}</a>
+                        @endif
+                    @endforeach
+                </div>
             @endif
 
             <div class="flex flex-wrap gap-3 mt-4">
@@ -28,18 +45,20 @@
                 @endif
             </div>
 
-            @if ($currentLesson->fileContents()->isNotEmpty())
+            @if (! empty($lessonExams) && count($lessonExams) > 0)
                 <div class="mt-6">
-                    <h3 class="font-medium mb-3">مرفقات الدرس</h3>
+                    <h3 class="font-medium mb-3">اختبارات الدرس</h3>
                     <ul class="grid gap-2">
-                        @foreach ($currentLesson->fileContents() as $file)
-                            <li>
-                                <a href="{{ $file->fileUrl() }}" download>{{ $file->displayName() }}</a>
+                        @foreach ($lessonExams as $lessonExam)
+                            <li class="flex flex-wrap items-center justify-between gap-2 border border-border rounded-md p-3">
+                                <span class="text-sm font-medium">{{ $lessonExam->title }}</span>
+                                <a href="{{ route('student.exams.show', $lessonExam) }}" class="nageeb-btn nageeb-btn--outline nageeb-btn--sm">بدء الاختبار</a>
                             </li>
                         @endforeach
                     </ul>
                 </div>
             @endif
+            </div>
         </div>
 
         <div class="nageeb-card mb-8">
@@ -65,31 +84,53 @@
                 <x-empty-state title="لا توجد أسئلة على هذا الدرس بعد." />
             @endforelse
         </div>
+            </div>
+
+            <aside class="nageeb-learn__rail nageeb-card" x-data>
+                <h2 class="nageeb-title-section mb-4">محتوى المادة</h2>
+                <p class="nageeb-caption mb-3">{{ $course->title }}</p>
+                @forelse ($course->units as $unit)
+                    <details class="py-3" open>
+                        <summary class="font-medium cursor-pointer">{{ $unit->title }}</summary>
+                        <ul class="mt-3 grid gap-1">
+                            @foreach ($unit->lessons as $lesson)
+                                <li>
+                                    <a
+                                        href="{{ route('student.my-courses.show', ['course' => $course, 'lesson' => $lesson->id]) }}"
+                                        @class(['nageeb-rail-link', 'is-active' => $currentLesson?->id === $lesson->id])
+                                    >
+                                        {{ $lesson->title }}
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </details>
+                @empty
+                    <x-empty-state title="لا توجد وحدات بعد." />
+                @endforelse
+            </aside>
+        </div>
     @else
         <div class="nageeb-alert nageeb-alert--info mb-8">لم يُضف محتوى لهذه المادة بعد.</div>
+        <div class="nageeb-card" x-data>
+            <h2 class="nageeb-title-section mb-4">محتوى المادة</h2>
+            @forelse ($course->units as $unit)
+                <details class="py-3" open>
+                    <summary class="font-medium cursor-pointer">{{ $unit->title }}</summary>
+                    <ul class="mt-3 grid gap-1">
+                        @foreach ($unit->lessons as $lesson)
+                            <li>
+                                <a href="{{ route('student.my-courses.show', ['course' => $course, 'lesson' => $lesson->id]) }}" class="nageeb-rail-link">
+                                    {{ $lesson->title }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </details>
+            @empty
+                <x-empty-state title="لا توجد وحدات بعد." />
+            @endforelse
+        </div>
     @endif
-
-    <div class="nageeb-card" x-data>
-        <h2 class="nageeb-title-section mb-4">محتوى المادة</h2>
-        @forelse ($course->units as $unit)
-            <details class="border-b border-border py-3" open>
-                <summary class="font-medium cursor-pointer">{{ $unit->title }}</summary>
-                <ul class="mt-3 grid gap-1">
-                    @foreach ($unit->lessons as $lesson)
-                        <li>
-                            <a
-                                href="{{ route('student.my-courses.show', ['course' => $course, 'lesson' => $lesson->id]) }}"
-                                @class(['block py-2 px-3', 'bg-primary text-text-inverse' => $currentLesson?->id === $lesson->id])
-                            >
-                                {{ $lesson->title }}
-                            </a>
-                        </li>
-                    @endforeach
-                </ul>
-            </details>
-        @empty
-            <x-empty-state title="لا توجد وحدات بعد." />
-        @endforelse
-    </div>
 </x-dashboard-layout>
 @endsection

@@ -1,68 +1,85 @@
 /**
  * نجيب (Nageeb) — Design System Tokens
- * متغيرات قابلة لإعادة الاستخدام عبر كل صفحات المنصة
+ * Warm cream, deep brown, terracotta accent · light mode only
  */
 
 :root {
     color-scheme: light;
 
-    /* Brand and semantic colors */
-    --nageeb-primary: #2457D6;
-    --nageeb-primary-hover: #1D46B2;
-    --nageeb-primary-light: #4E78E4;
-    --nageeb-primary-muted: #EEF3FF;
-    --nageeb-accent: #F4A62A;
-    --nageeb-accent-hover: #D98B12;
-    --nageeb-accent-muted: #FFF7E8;
+    /* Brand */
+    --nageeb-brown: #4A2F24;
+    --nageeb-navy: #4A2F24;
+    --nageeb-navy-muted: #F2EAE1;
+    --nageeb-chocolate: #2B1D18;
+    --nageeb-primary: #9A5B43;
+    --nageeb-primary-hover: #7E4A36;
+    --nageeb-primary-light: #C8A98A;
+    --nageeb-primary-muted: #F3E8DF;
+    --nageeb-accent: #C8A98A;
+    --nageeb-accent-hover: #B39274;
+    --nageeb-accent-muted: #F6EFE6;
 
-    /* Backwards-compatible aliases */
     --nageeb-secondary: var(--nageeb-accent);
     --nageeb-secondary-hover: var(--nageeb-accent-hover);
-    --nageeb-secondary-light: #FFC45F;
+    --nageeb-secondary-light: #D9C4AE;
     --nageeb-secondary-muted: var(--nageeb-accent-muted);
-    --nageeb-support: #168466;
-    --nageeb-support-hover: #106B53;
-    --nageeb-support-light: #51A991;
-    --nageeb-support-muted: #EAF8F4;
+    --nageeb-support: var(--nageeb-primary);
+    --nageeb-support-hover: var(--nageeb-primary-hover);
+    --nageeb-support-light: #C8A98A;
+    --nageeb-support-muted: var(--nageeb-primary-muted);
 
-    --nageeb-background: #F6F8FC;
+    --nageeb-sky: #9A5B43;
+    --nageeb-sky-muted: #F6EFE6;
+    --nageeb-cyan: #8A5640;
+    --nageeb-cyan-muted: #F3E8DF;
+    --nageeb-violet: #C8A98A;
+    --nageeb-violet-muted: #F6EFE6;
+
+    --nageeb-background: #FBF8F3;
+    --nageeb-canvas: #F2EAE1;
     --nageeb-surface: #FFFFFF;
-    --nageeb-surface-muted: #F0F3F8;
+    --nageeb-surface-muted: #F2EAE1;
     --nageeb-surface-raised: #FFFFFF;
-    --nageeb-text: #172033;
-    --nageeb-text-muted: #5F6B7E;
-    --nageeb-text-dim: #8A95A6;
-    --nageeb-text-inverse: #FFFFFF;
-    --nageeb-border: #E1E6EF;
-    --nageeb-border-strong: #CBD3E1;
+    --nageeb-text: #2B211D;
+    --nageeb-text-muted: #5F544E;
+    --nageeb-text-dim: #A0948C;
+    --nageeb-text-inverse: #FBF8F3;
+    --nageeb-border: #E9DED4;
+    --nageeb-border-strong: #DCCFC3;
 
-    --nageeb-success: #168466;
-    --nageeb-success-muted: #EAF8F4;
-    --nageeb-warning: #B66B09;
-    --nageeb-warning-muted: #FFF6E5;
-    --nageeb-danger: #C53B46;
-    --nageeb-danger-hover: #A92E38;
-    --nageeb-danger-muted: #FFF0F1;
-    --nageeb-info: #2563C7;
-    --nageeb-info-muted: #EDF4FF;
+    --nageeb-success: #5C7A5A;
+    --nageeb-success-muted: #E8F0E7;
+    --nageeb-warning: #C4893A;
+    --nageeb-warning-muted: #F7EEDF;
+    --nageeb-danger: #B45A4A;
+    --nageeb-danger-hover: #9A4A3C;
+    --nageeb-danger-muted: #F6E8E4;
+    --nageeb-info: #9A5B43;
+    --nageeb-info-muted: #F3E8DF;
     --nageeb-alert: var(--nageeb-danger);
     --nageeb-alert-hover: var(--nageeb-danger-hover);
     --nageeb-alert-muted: var(--nageeb-danger-muted);
 
-    /* Elevation */
-    --nageeb-shadow-xs: 0 1px 2px rgb(23 32 51 / 0.04);
-    --nageeb-shadow-sm: 0 1px 3px rgb(23 32 51 / 0.06), 0 1px 2px rgb(23 32 51 / 0.03);
-    --nageeb-shadow-md: 0 8px 24px rgb(23 32 51 / 0.08);
-    --nageeb-shadow-lg: 0 20px 48px rgb(23 32 51 / 0.12);
-    --nageeb-ring: 0 0 0 3px rgb(36 87 214 / 0.16);
+    --nageeb-shadow-xs: 0 1px 2px rgba(74, 47, 36, 0.04);
+    --nageeb-shadow-sm: 0 8px 30px rgba(74, 47, 36, 0.06);
+    --nageeb-shadow-md: 0 12px 32px rgba(74, 47, 36, 0.08);
+    --nageeb-shadow-lg: 0 20px 40px rgba(43, 29, 24, 0.1);
+    --nageeb-shadow-nav: 0 8px 24px rgba(74, 47, 36, 0.06);
+    --nageeb-ring: 0 0 0 3px rgba(154, 91, 67, 0.22);
 
-    /* ── Typography ── */
+    --nageeb-gradient-hero: linear-gradient(180deg, #FBF8F3 0%, rgb(242 234 225 / 0.7) 42%, #FBF8F3 100%);
+    --nageeb-gradient-sky: linear-gradient(180deg, #F6EFE6 0%, #FBF8F3 100%);
+    --nageeb-gradient-mint: linear-gradient(180deg, #F2EAE1 0%, #FBF8F3 100%);
+    --nageeb-gradient-cream: linear-gradient(180deg, #F6EFE6 0%, #FBF8F3 100%);
+    --nageeb-gradient-violet: linear-gradient(180deg, #FBF8F3 0%, #F2EAE1 100%);
+    --nageeb-gradient-cta: linear-gradient(135deg, #2B1D18 0%, #3D2A22 55%, #4A2F24 100%);
+
     --nageeb-font-sans: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
     --nageeb-font-mono: 'IBM Plex Mono', 'Courier New', monospace;
 
     --nageeb-text-xs: 0.75rem;
-    --nageeb-text-sm: 0.875rem;
-    --nageeb-text-base: 1rem;
+    --nageeb-text-sm: 0.9375rem;
+    --nageeb-text-base: 1.03125rem;
     --nageeb-text-lg: 1.125rem;
     --nageeb-text-xl: 1.25rem;
     --nageeb-text-2xl: 1.5rem;
@@ -70,11 +87,21 @@
     --nageeb-text-4xl: 2.25rem;
     --nageeb-text-5xl: 3rem;
 
-    --nageeb-leading-tight: 1.25;
+    --nageeb-type-display: clamp(3rem, 6vw, 4rem);
+    --nageeb-type-h1: clamp(2rem, 3.4vw, 2.5rem);
+    --nageeb-type-h2: clamp(1.75rem, 4vw, 2.5rem);
+    --nageeb-type-h3: clamp(1.125rem, 1.5vw, 1.375rem);
+    --nageeb-type-h4: 1.125rem;
+    --nageeb-type-body-lg: 1.125rem;
+    --nageeb-type-body: 1.03125rem;
+    --nageeb-type-body-sm: 0.9375rem;
+    --nageeb-type-caption: 0.75rem;
+    --nageeb-type-label: 0.8125rem;
+
+    --nageeb-leading-tight: 1.18;
     --nageeb-leading-normal: 1.7;
     --nageeb-leading-relaxed: 1.85;
 
-    /* ── Spacing ── */
     --nageeb-space-1: 0.25rem;
     --nageeb-space-2: 0.5rem;
     --nageeb-space-3: 0.75rem;
@@ -85,22 +112,21 @@
     --nageeb-space-8: 4rem;
     --nageeb-space-9: 6rem;
 
-    /* ── Radius ── */
-    --nageeb-radius-sm: 0.375rem;
-    --nageeb-radius-md: 0.625rem;
-    --nageeb-radius-lg: 0.875rem;
-    --nageeb-radius-xl: 1.25rem;
+    --nageeb-radius-sm: 0.75rem;
+    --nageeb-radius-md: 1rem;
+    --nageeb-radius-lg: 1.25rem;
+    --nageeb-radius-xl: 1.5rem;
     --nageeb-radius-full: 9999px;
 
-    /* ── Layout ── */
     --nageeb-container-sm: 42rem;
     --nageeb-container-md: 64rem;
     --nageeb-container-max: 90rem;
     --nageeb-sidebar-width: 17rem;
     --nageeb-topbar-height: 4.5rem;
 
-    /* ── Motion ── */
-    --nageeb-transition-fast: 140ms cubic-bezier(.2, .8, .2, 1);
-    --nageeb-transition-normal: 220ms cubic-bezier(.2, .8, .2, 1);
-    --nageeb-transition-slow: 360ms cubic-bezier(.2, .8, .2, 1);
+    --nageeb-transition-fast: 180ms cubic-bezier(.2, .8, .2, 1);
+    --nageeb-transition-normal: 280ms cubic-bezier(.2, .8, .2, 1);
+    --nageeb-transition-slow: 420ms cubic-bezier(.2, .8, .2, 1);
+    --nageeb-transition-reveal: 600ms cubic-bezier(.2, .8, .2, 1);
+    --nageeb-ease-out: cubic-bezier(.2, .8, .2, 1);
 }

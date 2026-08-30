@@ -17,10 +17,8 @@
     @endif
 
     <header class="course-workspace-header mb-6 p-4 sm:p-5 bg-surface border border-border rounded-xl">
-        <div class="course-workspace-header__cover rounded-lg">
-            @if ($course->coverUrl())
-                <img src="{{ $course->coverUrl() }}" alt="" class="course-workspace-header__img">
-            @endif
+        <div class="course-workspace-header__cover rounded-lg nageeb-media">
+            <img src="{{ \App\Support\NageebVisual::courseCover($course) }}" alt="" class="course-workspace-header__img" loading="lazy">
         </div>
         <div class="course-workspace-header__meta">
             <h1 class="nageeb-heading-2 mb-2">{{ $course->title }}</h1>

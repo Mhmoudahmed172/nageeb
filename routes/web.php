@@ -8,9 +8,13 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\StudentRegisterController;
 use App\Http\Controllers\Auth\TeacherRegisterController;
 use App\Http\Controllers\CourseCatalogController;
+use App\Http\Controllers\HealthController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ProtectedMediaController;
 use App\Http\Controllers\PublicTeacherProfileController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
+use App\Http\Controllers\Student\ExamController as StudentExamController;
 use App\Http\Controllers\Student\MyCoursesController;
 use App\Http\Controllers\Student\SubscriptionRequestController as StudentSubscriptionRequestController;
 use App\Http\Controllers\Teacher\AccessPlanController;
@@ -23,13 +27,20 @@ use App\Http\Controllers\Teacher\CourseController;
 use App\Http\Controllers\Teacher\DashboardController as TeacherDashboardController;
 use App\Http\Controllers\Teacher\EarningsController;
 use App\Http\Controllers\Teacher\EnrolledStudentController;
+use App\Http\Controllers\Teacher\ExamController;
+use App\Http\Controllers\Teacher\ExamQuestionController;
+use App\Http\Controllers\Teacher\ExamResultController;
+use App\Http\Controllers\Teacher\QuestionController;
 use App\Http\Controllers\Teacher\InteractionController;
 use App\Http\Controllers\Teacher\PayoutController;
 use App\Http\Controllers\Teacher\ProfileController as TeacherProfileController;
 use App\Http\Controllers\Teacher\SubscriptionRequestController as TeacherSubscriptionRequestController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [\App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/health', HealthController::class)->name('health');
+
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/design-system', fn () => view('design-system'))->name('design-system');
 
 Route::get('/courses', [CourseCatalogController::class, 'index'])->name('courses.index');
 Route::get('/teachers/{teacher}', [PublicTeacherProfileController::class, 'show'])->name('teachers.show');
@@ -49,8 +60,14 @@ Route::post('/logout', [LoginController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
 
-Route::middleware('auth')->post('/notifications/read-all', [NotificationController::class, 'markAllRead'])
-    ->name('notifications.read-all');
+Route::middleware('auth')->group(function () {
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])
+        ->name('notifications.read-all');
+    Route::get('/media/lesson-contents/{content}', [ProtectedMediaController::class, 'lessonContent'])
+        ->name('media.lesson-contents.show');
+    Route::get('/media/exams/{exam}', [ProtectedMediaController::class, 'examPaper'])
+        ->name('media.exams.show');
+});
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [OverviewController::class, 'index'])->name('dashboard');
@@ -113,6 +130,16 @@ Route::middleware(['auth', 'role:teacher'])->prefix('teacher')->name('teacher.')
         Route::delete('courses/{course}/packages/{accessPlan}', [AccessPlanController::class, 'destroy'])->name('courses.packages.destroy');
     });
 
+    Route::resource('exams', ExamController::class)->names('exams');
+    Route::get('exams/{exam}/questions', [ExamQuestionController::class, 'index'])->name('exams.questions.index');
+    Route::post('exams/{exam}/questions', [ExamQuestionController::class, 'store'])->name('exams.questions.store');
+    Route::put('exams/{exam}/questions/{question}', [ExamQuestionController::class, 'update'])->name('exams.questions.update');
+    Route::delete('exams/{exam}/questions/{question}', [ExamQuestionController::class, 'destroy'])->name('exams.questions.destroy');
+    Route::get('exams/{exam}/results', [ExamResultController::class, 'index'])->name('exams.results.index');
+    Route::get('exams/{exam}/results/{attempt}', [ExamResultController::class, 'show'])->name('exams.results.show');
+
+    Route::resource('questions', QuestionController::class)->except(['show'])->names('questions');
+
     Route::get('subscription-requests', [TeacherSubscriptionRequestController::class, 'index'])->name('subscription-requests.index');
     Route::post('subscription-requests/{subscriptionRequest}/approve', [TeacherSubscriptionRequestController::class, 'approve'])->name('subscription-requests.approve');
     Route::post('subscription-requests/{subscriptionRequest}/reject', [TeacherSubscriptionRequestController::class, 'reject'])->name('subscription-requests.reject');
@@ -138,6 +165,14 @@ Route::middleware(['auth', 'role:student'])->prefix('student')->name('student.')
     Route::get('my-courses', [MyCoursesController::class, 'index'])->name('my-courses.index');
     Route::get('my-courses/{course}', [MyCoursesController::class, 'show'])->name('my-courses.show');
     Route::post('my-courses/{course}/lessons/{lesson}/comments', [MyCoursesController::class, 'storeComment'])->name('my-courses.comments.store');
+
+    Route::get('exams', [StudentExamController::class, 'index'])->name('exams.index');
+    Route::get('exams/{exam}', [StudentExamController::class, 'show'])->name('exams.show');
+    Route::post('exams/{exam}/start', [StudentExamController::class, 'start'])->name('exams.start');
+    Route::get('exams/{exam}/attempts/{attempt}', [StudentExamController::class, 'take'])->name('exams.take');
+    Route::post('exams/{exam}/attempts/{attempt}/answer', [StudentExamController::class, 'answer'])->name('exams.answer');
+    Route::post('exams/{exam}/attempts/{attempt}/submit', [StudentExamController::class, 'submit'])->name('exams.submit');
+    Route::get('exams/{exam}/attempts/{attempt}/result', [StudentExamController::class, 'result'])->name('exams.result');
 
     Route::get('settings', [AccountSettingsController::class, 'edit'])->name('settings.edit');
     Route::put('settings', [AccountSettingsController::class, 'update'])->name('settings.update');

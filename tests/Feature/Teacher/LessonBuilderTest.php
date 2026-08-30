@@ -61,6 +61,7 @@ class LessonBuilderTest extends TestCase
 
     public function test_teacher_can_add_a_text_block_and_upload_a_video_block(): void
     {
+        Storage::fake('local');
         Storage::fake('public');
         [$teacher, $course, $lesson] = $this->lesson();
 
@@ -83,6 +84,12 @@ class LessonBuilderTest extends TestCase
             $blocks->pluck('type')->all(),
         );
         $this->assertSame([1, 2], $blocks->pluck('position')->all());
+
+        $video = $blocks->firstWhere('type', LessonContentType::Video);
+        $this->assertTrue($video->isStoredPrivately());
+        Storage::disk('local')->assertExists($video->data['path']);
+        Storage::disk('public')->assertMissing($video->data['path']);
+        $this->assertStringNotContainsString('/storage/', $video->accessUrl());
     }
 
     public function test_non_media_blocks_reject_file_uploads(): void

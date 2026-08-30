@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Support\ExternalUrl;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Storage;
 
 #[Fillable([
     'unit_id',
@@ -48,6 +48,11 @@ class Lesson extends Model
     public function contents(): HasMany
     {
         return $this->hasMany(LessonContent::class)->orderBy('position');
+    }
+
+    public function exams(): HasMany
+    {
+        return $this->hasMany(Exam::class);
     }
 
     public function videoContents(): Collection
@@ -88,9 +93,7 @@ class Lesson extends Model
             return null;
         }
 
-        $path = $block->data['path'] ?? null;
-
-        return $path ? Storage::disk('public')->url($path) : null;
+        return $block->accessUrl();
     }
 
     public function embedUrl(): ?string
@@ -102,10 +105,6 @@ class Lesson extends Model
             return null;
         }
 
-        if (preg_match('~(?:youtube\.com/watch\?v=|youtu\.be/)([A-Za-z0-9_-]+)~', $url, $matches)) {
-            return 'https://www.youtube.com/embed/'.$matches[1];
-        }
-
-        return $url;
+        return ExternalUrl::youtubeEmbed($url) ?? $url;
     }
 }

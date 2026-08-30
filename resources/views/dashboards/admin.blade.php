@@ -4,49 +4,43 @@
 
 @section('content')
 <x-dashboard-layout title="نظرة عامة" role-label="المدير" active-menu="dashboard">
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-10">
-        <div class="p-5 border border-border bg-primary-muted">
-            <p class="text-sm mb-1">المعلمون</p>
-            <p class="text-3xl font-bold price">{{ $teachersCount }}</p>
-        </div>
-        <div class="p-5 border border-border bg-support-muted">
-            <p class="text-sm mb-1">الطلاب</p>
-            <p class="text-3xl font-bold price">{{ $studentsCount }}</p>
-        </div>
-        <div class="p-5 border border-border bg-surface">
-            <p class="text-sm mb-1">المواد</p>
-            <p class="text-3xl font-bold price">{{ $coursesCount }}</p>
-        </div>
-        <div class="p-5 border border-border bg-secondary-muted">
-            <p class="text-sm mb-1">أرباح المنصة</p>
-            <p class="text-3xl font-bold price">{{ number_format($totalEarnings, 2) }} ₪</p>
-        </div>
-    </div>
+    <x-reveal class="mb-8">
+        <h2 class="nageeb-heading-1">صحة المنصة</h2>
+        <p class="nageeb-text-muted mt-2">أرقام حيّة للمعلمين والطلاب والمواد وأرباح المنصة.</p>
+    </x-reveal>
 
-    <div class="grid gap-6 lg:grid-cols-2 mb-10">
-        <div class="nageeb-card">
-            <div class="flex justify-between gap-3 mb-4">
-                <h2 class="font-semibold">معلّمون بانتظار التوثيق</h2>
+    <x-reveal stagger class="nageeb-kpi-strip mb-10">
+        <x-dashboard-stat class="nageeb-reveal-item" label="المعلمون" :value="$teachersCount" />
+        <x-dashboard-stat class="nageeb-reveal-item" label="الطلاب" :value="$studentsCount" />
+        <x-dashboard-stat class="nageeb-reveal-item" label="المواد" :value="$coursesCount" />
+        <x-dashboard-stat class="nageeb-reveal-item" label="أرباح المنصة" :value="number_format($totalEarnings, 2).' ₪'" />
+    </x-reveal>
+
+    <x-reveal stagger class="grid gap-6 lg:grid-cols-2 mb-10">
+        <x-card class="nageeb-reveal-item" title="معلّمون بانتظار التوثيق">
+            <x-slot:actions>
                 <a href="{{ route('admin.teachers.index') }}" class="text-sm font-medium">كل المعلمين</a>
-            </div>
+            </x-slot:actions>
             @if ($unverifiedTeachers->isEmpty())
                 <x-empty-state title="لا يوجد معلّمون بانتظار التوثيق." />
             @else
                 <ul class="divide-y divide-border">
                     @foreach ($unverifiedTeachers as $teacher)
-                        <li class="py-3 flex justify-between gap-3 text-sm">
-                            <span>{{ $teacher->name }}</span>
+                        <li class="py-3 flex items-center justify-between gap-3 text-sm">
+                            <span class="flex items-center gap-3 min-w-0">
+                                <img src="{{ \App\Support\NageebVisual::teacherPhoto($teacher) }}" alt="" class="nageeb-avatar nageeb-avatar--sm">
+                                <span class="truncate">{{ $teacher->name }}</span>
+                            </span>
                             <span class="nageeb-text-muted">{{ $teacher->teacherProfile?->specialization }}</span>
                         </li>
                     @endforeach
                 </ul>
             @endif
-        </div>
-        <div class="nageeb-card">
-            <div class="flex justify-between gap-3 mb-4">
-                <h2 class="font-semibold">سحوبات معلّقة</h2>
+        </x-card>
+        <x-card class="nageeb-reveal-item" title="سحوبات معلّقة">
+            <x-slot:actions>
                 <a href="{{ route('admin.payouts.index') }}" class="text-sm font-medium">كل الطلبات</a>
-            </div>
+            </x-slot:actions>
             @if ($pendingPayouts->isEmpty())
                 <x-empty-state title="لا توجد طلبات سحب معلّقة." />
             @else
@@ -59,25 +53,26 @@
                     @endforeach
                 </ul>
             @endif
-        </div>
-    </div>
+        </x-card>
+    </x-reveal>
 
-    <div class="nageeb-card max-w-xl text-sm">
-        <h2 class="font-medium mb-4">حسابك</h2>
-        <dl class="grid gap-3 sm:grid-cols-2">
-            <div>
-                <dt class="nageeb-text-dim mb-1">البريد</dt>
-                <dd>{{ $user->email }}</dd>
-            </div>
-            <div>
-                <dt class="nageeb-text-dim mb-1">الجوال</dt>
-                <dd>{{ $user->phone ?? '—' }}</dd>
-            </div>
-            <div>
-                <dt class="nageeb-text-dim mb-1">الدور</dt>
-                <dd><span class="nageeb-badge nageeb-badge--primary">{{ $user->role->label() }}</span></dd>
-            </div>
-        </dl>
-    </div>
+    <x-reveal>
+        <x-card title="حسابك">
+            <dl class="grid gap-3 sm:grid-cols-2 text-sm">
+                <div>
+                    <dt class="nageeb-text-dim mb-1">البريد</dt>
+                    <dd>{{ $user->email }}</dd>
+                </div>
+                <div>
+                    <dt class="nageeb-text-dim mb-1">الجوال</dt>
+                    <dd>{{ $user->phone ?? '—' }}</dd>
+                </div>
+                <div>
+                    <dt class="nageeb-text-dim mb-1">الدور</dt>
+                    <dd><span class="nageeb-badge nageeb-badge--primary">{{ $user->role->label() }}</span></dd>
+                </div>
+            </dl>
+        </x-card>
+    </x-reveal>
 </x-dashboard-layout>
 @endsection

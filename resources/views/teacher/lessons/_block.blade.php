@@ -93,14 +93,17 @@
                         <div class="lesson-block__media-icon"><x-nav-icon name="video" class="size-6" /></div>
                         <div class="min-w-0">
                             <p class="font-semibold text-sm truncate">{{ $data['original_name'] ?? $data['name'] ?? 'ملف الفيديو' }}</p>
-                            <p class="nageeb-caption mt-1">
-                                {{ VideoAsset::stateLabel($content) }}
-                                @if ($duration = VideoAsset::durationLabel($content))
-                                    · المدة {{ $duration }}
-                                @endif
-                            </p>
-                        </div>
-                        <p class="lesson-block__media-note">
+                        <p class="nageeb-caption mt-1">
+                            {{ VideoAsset::stateLabel($content) }}
+                            @if ($duration = VideoAsset::durationLabel($content))
+                                · المدة {{ $duration }}
+                            @endif
+                        </p>
+                    </div>
+                    @if ($content->accessUrl())
+                        <video class="w-full mt-3" controls preload="metadata" src="{{ $content->accessUrl() }}"></video>
+                    @endif
+                    <p class="lesson-block__media-note">
                             يُعرض هذا الفيديو للطلاب عبر مشغل محمي داخل المنصة، ولا يتم إنشاء رابط عام له.
                         </p>
                     </div>
@@ -123,6 +126,9 @@
                         <div class="min-w-0">
                             <p class="font-semibold text-sm truncate">{{ $data['name'] ?? 'مرفق' }}</p>
                             <p class="nageeb-caption mt-1">مرفق قابل للتحميل للطلاب المشتركين</p>
+                    @if ($content->accessUrl())
+                        <a href="{{ $content->accessUrl() }}" class="nageeb-btn nageeb-btn--outline nageeb-btn--sm mt-2">معاينة الملف</a>
+                    @endif
                         </div>
                     </div>
                     @break

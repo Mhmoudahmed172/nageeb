@@ -9,13 +9,17 @@ use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\LessonView;
 use App\Support\ContentAccess;
+use App\Support\ExamAccess;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class MyCoursesController extends Controller
 {
-    public function __construct(private readonly ContentAccess $contentAccess) {}
+    public function __construct(
+        private readonly ContentAccess $contentAccess,
+        private readonly ExamAccess $examAccess,
+    ) {}
 
     public function index(): View
     {
@@ -99,6 +103,10 @@ class MyCoursesController extends Controller
             );
         }
 
+        $lessonExams = $currentLesson
+            ? $this->examAccess->publishedExamsForLesson($user, $currentLesson)
+            : collect();
+
         return view('student.my-courses.show', [
             'course' => $course,
             'lessons' => $lessons,
@@ -106,6 +114,7 @@ class MyCoursesController extends Controller
             'previousLesson' => $previousLesson,
             'nextLesson' => $nextLesson,
             'questions' => $questions,
+            'lessonExams' => $lessonExams,
         ]);
     }
 

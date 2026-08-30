@@ -13,11 +13,12 @@
         \App\Enums\UserRole::Teacher => [
             ['key' => 'dashboard', 'label' => 'الرئيسية', 'route' => 'teacher.dashboard', 'icon' => 'home'],
             [
-                'label' => 'التعليم',
+                'label' => 'المحتوى',
                 'children' => [
                     ['key' => 'courses', 'label' => 'المواد', 'route' => 'teacher.courses.index', 'icon' => 'book'],
                     ['key' => 'content', 'label' => 'الوحدات والدروس', 'route' => 'teacher.courses.index', 'icon' => 'layers'],
-                    ['key' => 'quizzes', 'label' => 'الاختبارات', 'route' => null, 'icon' => 'quiz'],
+                    ['key' => 'quizzes', 'label' => 'الاختبارات', 'route' => 'teacher.exams.index', 'icon' => 'quiz'],
+                    ['key' => 'questions', 'label' => 'بنك الأسئلة', 'route' => 'teacher.questions.index', 'icon' => 'assignment'],
                     ['key' => 'assignments', 'label' => 'الواجبات', 'route' => null, 'icon' => 'assignment'],
                     ['key' => 'live', 'label' => 'البث المباشر', 'route' => null, 'icon' => 'live'],
                 ],
@@ -31,7 +32,7 @@
                 ],
             ],
             [
-                'label' => 'المبيعات',
+                'label' => 'الإدارة',
                 'children' => [
                     ['key' => 'packages', 'label' => 'الاشتراكات', 'route' => 'teacher.packages.index', 'icon' => 'subscription'],
                     ['key' => 'subscription-requests', 'label' => 'الطلبات', 'route' => 'teacher.subscription-requests.index', 'icon' => 'orders'],
@@ -48,9 +49,10 @@
             ],
         ],
         \App\Enums\UserRole::Student => [
-            ['key' => 'dashboard', 'label' => 'لوحتي', 'route' => 'student.dashboard'],
-            ['key' => 'courses', 'label' => 'موادي', 'route' => 'student.my-courses.index'],
-            ['key' => 'settings', 'label' => 'إعدادات الحساب', 'route' => 'student.settings.edit'],
+            ['key' => 'dashboard', 'label' => 'لوحتي', 'route' => 'student.dashboard', 'icon' => 'home'],
+            ['key' => 'courses', 'label' => 'موادي', 'route' => 'student.my-courses.index', 'icon' => 'book'],
+            ['key' => 'exams', 'label' => 'الاختبارات', 'route' => 'student.exams.index', 'icon' => 'quiz'],
+            ['key' => 'settings', 'label' => 'إعدادات الحساب', 'route' => 'student.settings.edit', 'icon' => 'settings'],
         ],
         \App\Enums\UserRole::Admin => [
             ['key' => 'dashboard', 'label' => 'نظرة عامة', 'route' => 'admin.dashboard'],
@@ -60,7 +62,7 @@
     };
 @endphp
 
-<div class="min-h-screen lg:flex" x-data="{ sidebarCollapsed: localStorage.getItem('nageeb-sidebar') === 'collapsed' }">
+<div class="nageeb-page min-h-screen lg:flex" x-data="{ sidebarCollapsed: localStorage.getItem('nageeb-sidebar') === 'collapsed' }">
     <input
         type="checkbox"
         id="dashboard-sidebar-toggle"
@@ -75,7 +77,7 @@
     ></label>
 
     <aside
-        class="fixed top-0 start-0 z-50 flex h-dvh w-[min(var(--nageeb-sidebar-width),90vw)] shrink-0 translate-x-full flex-col overflow-y-auto bg-surface border-e border-border shadow-lg transition-[width,transform] duration-200 max-lg:peer-checked:translate-x-0 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:translate-x-0 lg:shadow-none"
+        class="nageeb-sidebar fixed top-0 start-0 z-50 flex h-dvh w-[min(var(--nageeb-sidebar-width),90vw)] shrink-0 translate-x-full flex-col overflow-y-auto bg-surface border-e border-border shadow-lg transition-[width,transform] duration-200 max-lg:peer-checked:translate-x-0 lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:translate-x-0 lg:shadow-none"
         :class="sidebarCollapsed ? 'lg:w-[5.25rem]' : 'lg:w-[var(--nageeb-sidebar-width)]'"
     >
         <div class="px-5 py-5 flex items-start justify-between gap-3 border-b border-border">
@@ -95,7 +97,19 @@
             </label>
         </div>
 
-        <nav class="flex-1 px-3 py-5" aria-label="قائمة لوحة التحكم">
+        <div class="nageeb-sidebar-profile" x-show="!sidebarCollapsed">
+            @if ($user->isTeacher())
+                <img src="{{ \App\Support\NageebVisual::teacherPhoto($user) }}" alt="" class="nageeb-avatar" loading="lazy">
+            @else
+                <span class="nageeb-mark nageeb-mark--sm" aria-hidden="true">{{ mb_substr($user->name, 0, 1) }}</span>
+            @endif
+            <div class="min-w-0">
+                <p class="text-sm font-semibold truncate">{{ $user->name }}</p>
+                <p class="nageeb-caption truncate">{{ $roleLabel }}</p>
+            </div>
+        </div>
+
+        <nav class="nageeb-dash-nav flex-1 px-3 py-4" aria-label="قائمة لوحة التحكم">
             <ul class="flex flex-col gap-4">
                 @foreach ($menu as $item)
                     <li>
@@ -107,8 +121,8 @@
                                         <a
                                             href="{{ $child['route'] ? $menuHref($child['route']) : '#' }}"
                                             @class([
-                                                'flex w-full items-center px-3 py-2.5 text-sm font-medium rounded-md transition-colors',
-                                                'bg-primary-muted text-primary' => $activeMenu === $child['key'],
+                                                'nageeb-dash-nav__link flex w-full items-center px-3 py-2.5 text-sm font-medium rounded-md',
+                                                'is-active bg-primary-muted text-primary' => $activeMenu === $child['key'],
                                                 'text-text-muted hover:bg-surface-muted hover:text-text' => $activeMenu !== $child['key'] && $child['route'],
                                                 'text-text-dim opacity-55 cursor-not-allowed' => ! $child['route'],
                                             ])
@@ -125,8 +139,8 @@
                             <a
                                 href="{{ $menuHref($item['route']) }}"
                                 @class([
-                                    'flex w-full items-center px-3 py-2.5 text-sm font-medium rounded-md transition-colors',
-                                    'bg-primary-muted text-primary' => $activeMenu === $item['key'],
+                                    'nageeb-dash-nav__link flex w-full items-center px-3 py-2.5 text-sm font-medium rounded-md',
+                                    'is-active bg-primary-muted text-primary' => $activeMenu === $item['key'],
                                     'text-text-muted hover:bg-surface-muted hover:text-text' => $activeMenu !== $item['key'],
                                 ])
                                 @if ($activeMenu === $item['key']) aria-current="page" @endif
@@ -186,7 +200,12 @@
                         <div
                             x-show="open"
                             x-cloak
-                            x-transition
+                            x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 translate-y-1"
+                            x-transition:enter-end="opacity-100 translate-y-0"
+                            x-transition:leave="transition ease-in duration-150"
+                            x-transition:leave-start="opacity-100 translate-y-0"
+                            x-transition:leave-end="opacity-0 translate-y-1"
                             @click.outside="open = false"
                             class="nageeb-dropdown absolute top-full mt-2 bg-surface border border-border shadow-md z-50 p-3"
                             role="menu"
@@ -206,7 +225,7 @@
                                     <p class="text-xs nageeb-text-muted">{{ $notification->data['body'] ?? '' }}</p>
                                 </a>
                             @empty
-                                <x-empty-state title="لا توجد إشعارات." />
+                                <x-empty-state plain title="لا توجد إشعارات." />
                             @endforelse
                         </div>
                     </div>
@@ -221,10 +240,26 @@
             </div>
         </header>
 
-        <main @class(['nageeb-container py-6 sm:py-8 flex-1 w-full min-w-0', 'max-lg:pb-24' => $user->isTeacher()])>
+        <main @class(['nageeb-container py-6 sm:py-8 flex-1 w-full min-w-0', 'max-lg:pb-24' => $user->isTeacher() || $user->isStudent()])>
             {{ $slot }}
         </main>
     </div>
+
+    @if ($user->isStudent())
+        <nav class="lg:hidden fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-border bg-surface/95 backdrop-blur px-2 pb-[env(safe-area-inset-bottom)]" aria-label="التنقل السريع">
+            @foreach ([
+                ['dashboard', 'لوحتي', 'student.dashboard', 'home'],
+                ['courses', 'موادي', 'student.my-courses.index', 'book'],
+                ['exams', 'الاختبارات', 'student.exams.index', 'quiz'],
+                ['settings', 'الحساب', 'student.settings.edit', 'settings'],
+            ] as [$key, $label, $routeName, $icon])
+                <a href="{{ route($routeName) }}" @class(['flex min-h-16 flex-col items-center justify-center gap-1 text-[0.65rem]', 'text-primary' => $activeMenu === $key, 'text-text-muted' => $activeMenu !== $key])>
+                    <x-nav-icon :name="$icon" />
+                    <span>{{ $label }}</span>
+                </a>
+            @endforeach
+        </nav>
+    @endif
 
     @if ($user->isTeacher())
         <nav class="lg:hidden fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-border bg-surface/95 backdrop-blur px-2 pb-[env(safe-area-inset-bottom)]" aria-label="التنقل السريع">

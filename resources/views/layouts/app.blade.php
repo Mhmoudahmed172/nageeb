@@ -11,7 +11,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-background text-text antialiased min-h-screen">
+<body class="nageeb-page bg-background text-text antialiased min-h-screen">
     @yield('content')
     <x-toast />
     @stack('scripts')

@@ -14,6 +14,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->web(prepend: [
+            \App\Http\Middleware\DetectOversizedUploads::class,
+        ]);
+
+        $trustedProxies = env('TRUSTED_PROXIES');
+        if (filled($trustedProxies)) {
+            $middleware->trustProxies(
+                at: $trustedProxies === '*' ? '*' : array_map('trim', explode(',', (string) $trustedProxies)),
+            );
+        }
+
         $middleware->alias([
             'role' => EnsureRole::class,
         ]);

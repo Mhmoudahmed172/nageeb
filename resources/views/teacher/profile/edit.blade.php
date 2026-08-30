@@ -12,7 +12,7 @@
         @csrf
         @method('PUT')
         @if ($profile?->avatarSrc())
-            <img src="{{ $profile->avatarSrc() }}" alt="" class="w-24 h-24 object-cover">
+            <img src="{{ $profile->avatarSrc() }}" alt="" class="w-24 h-24 object-cover rounded-full">
         @endif
         <div class="nageeb-field">
             <label for="avatar" class="nageeb-label">الصورة الشخصية</label>

@@ -16,6 +16,12 @@ return [
     'default' => env('FILESYSTEM_DISK', 'local'),
 
     /*
+    | Protected lesson videos, attachments, and exam papers.
+    | Use `local` (storage/app/private) or `s3` (private bucket). Never `public`.
+    */
+    'media_disk' => env('MEDIA_DISK', env('FILESYSTEM_DISK', 'local')),
+
+    /*
     |--------------------------------------------------------------------------
     | Filesystem Disks
     |--------------------------------------------------------------------------
@@ -56,6 +62,7 @@ return [
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+            'visibility' => 'private',
             'throw' => false,
             'report' => false,
         ],

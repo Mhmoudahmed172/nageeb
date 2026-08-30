@@ -46,6 +46,16 @@ class Unit extends Model
         return $this->hasMany(Lesson::class)->orderBy('position');
     }
 
+    public function exams(): HasMany
+    {
+        return $this->hasMany(Exam::class);
+    }
+
+    public function questions(): HasMany
+    {
+        return $this->hasMany(Question::class);
+    }
+
     public function belongsToCourse(Course $course): bool
     {
         return $this->semester?->course_id === $course->id;

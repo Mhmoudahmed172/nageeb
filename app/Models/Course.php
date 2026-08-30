@@ -122,6 +122,11 @@ class Course extends Model
         return $this->hasMany(CourseAttachment::class)->orderBy('position');
     }
 
+    public function exams(): HasMany
+    {
+        return $this->hasMany(Exam::class);
+    }
+
     public function resolveChildRouteBinding($childType, $value, $field)
     {
         $field ??= 'id';

@@ -8,6 +8,7 @@
         direction: rtl;
         text-align: start;
         scroll-behavior: smooth;
+        color-scheme: light only;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         text-rendering: optimizeLegibility;

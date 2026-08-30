@@ -4,9 +4,14 @@
 
 @section('content')
 <x-dashboard-layout title="طلب اشتراك" role-label="الطالب" active-menu="courses">
-    <div class="nageeb-card max-w-2xl mb-6">
-        <h2 class="nageeb-title-section mb-2">{{ $course->title }}</h2>
-        <p class="nageeb-text-muted">المعلّم: {{ $course->teacher->name }}</p>
+    <div class="nageeb-card max-w-2xl mb-6 !p-0 overflow-hidden">
+        <div class="nageeb-media aspect-[16/7]">
+            <img src="{{ \App\Support\NageebVisual::courseCover($course) }}" alt="">
+        </div>
+        <div class="p-6">
+            <h2 class="nageeb-title-section mb-2">{{ $course->title }}</h2>
+            <p class="nageeb-text-muted">المعلّم: {{ $course->teacher->name }}</p>
+        </div>
     </div>
 
     @if ($course->accessPlans->isEmpty())
@@ -21,7 +26,7 @@
                 <legend class="nageeb-label mb-2">اختر خطة الوصول</legend>
                 @foreach ($course->accessPlans as $plan)
                     @php $price = $plan->priceFor($region); @endphp
-                    <label class="flex items-start gap-3 border border-border p-4 cursor-pointer">
+                    <label class="access-plan-choice">
                         <input
                             type="radio"
                             name="access_plan_id"
