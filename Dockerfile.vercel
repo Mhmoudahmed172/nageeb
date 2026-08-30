@@ -1,26 +1,68 @@
-# Vercel container: FrankenPHP + Caddy at /app.
-# Vite assets are built in a Node stage and copied into the final image.
+# ============================================================
+# Stage 1: Build Vite frontend assets
+# ============================================================
+FROM node:22-alpine AS frontend
 
-FROM node:22-alpine AS assets
 WORKDIR /app
+
+# Install JavaScript dependencies first for better Docker caching
 COPY package.json package-lock.json ./
+
 RUN npm ci
+
+# Copy files required by Vite
 COPY resources ./resources
-COPY vite.config.js ./
 COPY public ./public
+COPY vite.config.js ./
+
+# Build production assets
 RUN npm run build
 
-FROM composer:2 AS deps
-WORKDIR /app
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-interaction --no-progress --optimize-autoloader --no-scripts
+# Verify that Laravel Vite manifest was generated
+RUN test -f /app/public/build/manifest.json
 
-FROM dunglas/frankenphp:1-php8.4-alpine
-RUN install-php-extensions pdo_pgsql pgsql
+
+# ============================================================
+# Stage 2: Install PHP / Composer dependencies
+# ============================================================
+FROM composer:2 AS deps
+
 WORKDIR /app
+
+COPY composer.json composer.lock ./
+
+RUN composer install \
+    --no-dev \
+    --no-interaction \
+    --no-progress \
+    --optimize-autoloader \
+    --no-scripts
+
+
+# ============================================================
+# Stage 3: Final Laravel + FrankenPHP image
+# ============================================================
+FROM dunglas/frankenphp:1-php8.4-alpine
+
+# Install PostgreSQL PHP extensions
+RUN install-php-extensions pdo_pgsql pgsql
+
+WORKDIR /app
+
+# Copy Composer dependencies
 COPY --from=deps /app/vendor ./vendor
+
+# Copy Laravel application
 COPY . .
-COPY --from=assets /app/public/build ./public/build
+
+# Copy Vite production assets from frontend build stage
+COPY --from=frontend /app/public/build ./public/build
+
+# Copy Caddy configuration
 COPY Caddyfile /etc/caddy/Caddyfile
+
+# Vercel provides PORT
 ENV PORT=80
+
+# Start FrankenPHP
 CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]
