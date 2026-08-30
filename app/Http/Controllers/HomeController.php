@@ -33,12 +33,18 @@ class HomeController extends Controller
             ->take(5)
             ->get();
 
+        $roleCounts = User::query()
+            ->selectRaw('role, count(*) as aggregate')
+            ->whereIn('role', [UserRole::Student, UserRole::Teacher])
+            ->groupBy('role')
+            ->pluck('aggregate', 'role');
+
         return view('welcome', [
             'heroCourses' => $heroCourses,
             'exploreCourses' => $exploreCourses,
             'teachers' => $teachers,
-            'studentsCount' => User::query()->where('role', UserRole::Student)->count(),
-            'teachersCount' => User::query()->where('role', UserRole::Teacher)->count(),
+            'studentsCount' => (int) ($roleCounts[UserRole::Student->value] ?? 0),
+            'teachersCount' => (int) ($roleCounts[UserRole::Teacher->value] ?? 0),
             'liveCoursesCount' => $liveCourses->count(),
         ]);
     }

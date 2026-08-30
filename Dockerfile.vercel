@@ -41,7 +41,7 @@ RUN composer install \
 # ============================================================
 FROM dunglas/frankenphp:1-php8.4-alpine
 
-RUN install-php-extensions pdo_pgsql pgsql
+RUN install-php-extensions pdo_pgsql pgsql opcache
 
 WORKDIR /app
 
@@ -49,6 +49,7 @@ COPY --from=deps /app/vendor /app/vendor
 COPY . /app
 COPY --from=frontend /app/public/build /opt/vite-build
 COPY docker/frankenphp-start.sh /usr/local/bin/frankenphp-start.sh
+COPY docker/php.ini /usr/local/etc/php/conf.d/nageeb.ini
 COPY Caddyfile /etc/caddy/Caddyfile
 
 RUN chmod +x /usr/local/bin/frankenphp-start.sh \
